@@ -1,0 +1,9 @@
+.idea
+.vscode
+.catkin*
+.DS_Store
+
+cmake-build-*
+src/CMakeLists.txt
+build
+devel

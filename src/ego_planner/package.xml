@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>ego_planner</name>
+    <version>0.0.0</version>
+    <description>
+        The ego_planner package V2.1
+        
+        This is a collection of small packages in the planner directory of EGO Planner V2.
+        The creator of this package claims no authorship of any ported package.
+        Credits remains absolutely to their original authors.
+
+        It includes the following ported packages:
+        * planner/drone_detect --- src/drone_detect_node.cpp
+        * planner/path_searching --- src/path_searching
+        * planner/plan_env --- src/plan_env
+        * planner/plan_manage --- src/ego_planner_node.cpp, src/traj_server.cpp
+        * planner/swarm_bridge --- src/bridge_node_udp.cpp, src/traj2odom_node.cpp
+        * planner/traj_opt --- src/optimizer
+        * planner/traj_utils --- src/traj_utils
+        * Utils/moving_obstacles --- moving_obstacles.cpp
+    </description>
+
+    <!-- One maintainer tag required, multiple allowed, one person per tag -->
+    <!-- Example:  -->
+    <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+    <maintainer email="ryan@todo.todo">ryan</maintainer>
+
+
+    <!-- One license tag required, multiple allowed, one license per tag -->
+    <!-- Commonly used license strings: -->
+    <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+    <license>TODO</license>
+
+
+    <!-- Url tags are optional, but multiple are allowed, one per tag -->
+    <!-- Optional attribute type can be: website, bugtracker, or repository -->
+    <!-- Example: -->
+    <!-- <url type="website">http://wiki.ros.org/ego_planner</url> -->
+
+
+    <!-- Author tags are optional, multiple are allowed, one per tag -->
+    <!-- Authors do not have to be maintainers, but could be -->
+    <!-- Example: -->
+    <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+
+
+    <!-- The *depend tags are used to specify dependencies -->
+    <!-- Dependencies can be catkin packages or system dependencies -->
+    <!-- Examples: -->
+    <!-- Use depend as a shortcut for packages that are both build and exec dependencies -->
+    <!--   <depend>roscpp</depend> -->
+    <!--   Note that this is equivalent to the following: -->
+    <!--   <build_depend>roscpp</build_depend> -->
+    <!--   <exec_depend>roscpp</exec_depend> -->
+    <!-- Use build_depend for packages you need at compile time: -->
+    <!--   <build_depend>message_generation</build_depend> -->
+    <!-- Use build_export_depend for packages you need in order to build against this package: -->
+    <!--   <build_export_depend>message_generation</build_export_depend> -->
+    <!-- Use buildtool_depend for build tool packages: -->
+    <!--   <buildtool_depend>catkin</buildtool_depend> -->
+    <!-- Use exec_depend for packages you need at runtime: -->
+    <!--   <exec_depend>message_runtime</exec_depend> -->
+    <!-- Use test_depend for packages you need only for testing: -->
+    <!--   <test_depend>gtest</test_depend> -->
+    <!-- Use doc_depend for packages you need only for building documentation: -->
+    <!--   <doc_depend>doxygen</doc_depend> -->
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>quadrotor_msgs</build_depend>
+    <build_depend>trajectory_msgs</build_depend>
+
+    <!-- The export tag contains other, unspecified, tags -->
+    <export>
+        <!-- Other tools can request additional information be placed here -->
+
+    </export>
+</package>

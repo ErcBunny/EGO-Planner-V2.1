@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>simulator</name>
+    <version>0.0.0</version>
+    <description>
+        The simulator package for EGO planner V2.1
+
+        This is a collection of small packages in uav_simulator
+        and Utils from the EGO Planner V2 repo.
+
+        The creator of this "simulator" package claims no authorship of any ported package.
+        Credits remains absolutely to their original authors.
+
+        The following packages from the main_ws of EGO planner V2 are ported here:
+        * uav_simulator/fake_drone --- src/poscmd_2_odom.cpp
+        * uav_simulator/local_sensing/pointcloud_render_node --- src/pointcloud_render_node.cpp
+        * uav_simulator/map_generator --- src/random_forest_sensing.cpp
+        * uav_simulator/mockamap --- src/mockamap.cpp,
+        * Utils/assign_goals --- src/assign_goals_node.cpp
+        * Utils/manual_take_over --- src/ground_station.cpp, manual_take_over.cpp
+        * Utils/odom_visualization --- src/odom_visualization.cpp
+        * Utils/pose_utils --- src/pose_utils
+        * Utils/random_goals --- src/random_goals_node.cpp
+        * Utils/rviz_plugins --- src/rviz_plugins
+        * Utils/selected_points_publisher --- src/rviz_plugins
+        * Utils/uav_utils --- include/uav_utils
+
+        The following packages are ported to somewhere else:
+        * Utils/moving_obstacles
+        * Utils/quadrotor_msgs
+
+        The following packages are discarded as they are not used in simulation:
+        * uav_simulator/so3_control
+        * uav_simulator/so3_quadrotor_simulator
+    </description>
+
+    <!-- One maintainer tag required, multiple allowed, one person per tag -->
+    <!-- Example:  -->
+    <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+    <maintainer email="ryan@todo.todo">ryan</maintainer>
+
+
+    <!-- One license tag required, multiple allowed, one license per tag -->
+    <!-- Commonly used license strings: -->
+    <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+    <license>TODO</license>
+
+
+    <!-- Url tags are optional, but multiple are allowed, one per tag -->
+    <!-- Optional attribute type can be: website, bugtracker, or repository -->
+    <!-- Example: -->
+    <!-- <url type="website">http://wiki.ros.org/simulator</url> -->
+
+
+    <!-- Author tags are optional, multiple are allowed, one per tag -->
+    <!-- Authors do not have to be maintainers, but could be -->
+    <!-- Example: -->
+    <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+
+
+    <!-- The *depend tags are used to specify dependencies -->
+    <!-- Dependencies can be catkin packages or system dependencies -->
+    <!-- Examples: -->
+    <!-- Use depend as a shortcut for packages that are both build and exec dependencies -->
+    <!--   <depend>roscpp</depend> -->
+    <!--   Note that this is equivalent to the following: -->
+    <!--   <build_depend>roscpp</build_depend> -->
+    <!--   <exec_depend>roscpp</exec_depend> -->
+    <!-- Use build_depend for packages you need at compile time: -->
+    <!--   <build_depend>message_generation</build_depend> -->
+    <!-- Use build_export_depend for packages you need in order to build against this package: -->
+    <!--   <build_export_depend>message_generation</build_export_depend> -->
+    <!-- Use buildtool_depend for build tool packages: -->
+    <!--   <buildtool_depend>catkin</buildtool_depend> -->
+    <!-- Use exec_depend for packages you need at runtime: -->
+    <!--   <exec_depend>message_runtime</exec_depend> -->
+    <!-- Use test_depend for packages you need only for testing: -->
+    <!--   <test_depend>gtest</test_depend> -->
+    <!-- Use doc_depend for packages you need only for building documentation: -->
+    <!--   <doc_depend>doxygen</doc_depend> -->
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>quadrotor_msgs</build_depend>
+    <build_depend>trajectory_msgs</build_depend>
+
+    <exec_depend>rviz</exec_depend>
+
+    <!-- The export tag contains other, unspecified, tags -->
+    <export>
+        <!-- Other tools can request additional information be placed here -->
+        <rviz plugin="${prefix}/plugin_description.xml"/>
+
+    </export>
+</package>
