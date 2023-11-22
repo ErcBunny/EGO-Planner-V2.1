@@ -11,7 +11,7 @@ For specific details, please refer to the `package.xml` files. It's important to
 
 ## Environment Setup
 
-To set up the environment, follow the steps below. You can either use the system-installed ROS 1 from the EGO Planner V2 repository or set up a virtual environment (see below).
+To set up the environment, follow the steps below. You can either follow the [guide](https://github.com/ZJU-FAST-Lab/EGO-Planner-v2/blob/main/swarm-playground/%5BREADME%5D_Brief_Documentation_for_Swarm_Playground.pdf) in the original repository or set up a virtual environment (see below).
 
 ```sh
 # Create and activate a virtual environment
