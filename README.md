@@ -7,7 +7,7 @@ In this refactor, small packages from the original codebase have been consolidat
 * Faster Compilation: The reduction in the number of `CMakeLists.txt` files streamlines the compilation process (3x faster on 13900K).
 * Cleaner Code Layout: Standalone packages have been minimized, and all demo launch files are now conveniently located under the `node_launcher` package.
 
-For specific details, please refer to the package.xml files. It's important to note that all credits for the ported packages remain with the original authors.
+For specific details, please refer to the `package.xml` files. It's important to note that all credits for the ported packages remain with the original authors.
 
 ## Environment Setup
 
@@ -31,7 +31,7 @@ catkin_make
 
 ```sh
 # Activate the virtual environment and source the setup file
-conda activate ego
+mamba activate ego
 source devel/setup.bash
 
 # Run launch files (e.g., multi_drone_interactive.launch)
