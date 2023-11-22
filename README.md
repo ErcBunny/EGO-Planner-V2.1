@@ -20,7 +20,7 @@ mamba activate ego
 
 # Install ROS and additional dependencies
 mamba install ros-noetic-desktop-full=1.5.0 ros-noetic-joy -c robostack-staging -y
-mamba install compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools
+mamba install compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools -y
 mamba install armadillo -y
 
 # Build the workspace
