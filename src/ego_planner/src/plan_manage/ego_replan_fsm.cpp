@@ -1,4 +1,3 @@
-
 #include <plan_manage/ego_replan_fsm.h>
 
 namespace ego_planner {
@@ -19,6 +18,8 @@ namespace ego_planner {
         nh.param("fsm/realworld_experiment", flag_realworld_experiment_, false);
         nh.param("fsm/fail_safe", enable_fail_safe_, true);
         nh.param("fsm/ground_height_measurement", enable_ground_height_measurement_, false);
+        nh.param("fsm/auto_start_delay_sec", auto_start_delay_sec_, 5.0);
+        nh.param("fsm/rdp_eps", rdp_eps_, 0.5);
 
         nh.param("fsm/waypoint_num", waypoint_num_, -1);
         for (int i = 0; i < waypoint_num_; i++) {
@@ -60,9 +61,9 @@ namespace ego_planner {
         } else if (target_type_ == TARGET_TYPE::PRESET_TARGET) {
             trigger_sub_ = nh.subscribe("/traj_start_trigger", 1, &EGOReplanFSM::triggerCallback, this);
 
-            ROS_INFO("Wait for 2 second.");
+            ROS_INFO("Wait for several second for global cloud generation.");
             int count = 0;
-            while (ros::ok() && count++ < 2000) {
+            while (ros::ok() && count++ < auto_start_delay_sec_ * 1000) {
                 ros::spinOnce();
                 ros::Duration(0.001).sleep();
             }
@@ -110,9 +111,14 @@ namespace ego_planner {
                     if (success) {
                         changeFSMExecState(EXEC_TRAJ, "FSM");
                     } else {
-                        ROS_WARN("Failed to generate the first trajectory, keep trying");
-                        changeFSMExecState(SEQUENTIAL_START,
-                                           "FSM"); // "changeFSMExecState" must be called each time planned
+                        if (continously_called_times_ > 2) {
+                            ROS_WARN("Initiating escape plan -> search escape path");
+                            changeFSMExecState(SEARCH_ESCAPE, "FSM");
+                        } else {
+                            ROS_WARN("Failed to generate the first trajectory, keep trying");
+                            // "changeFSMExecState" must be called each time planned
+                            changeFSMExecState(SEQUENTIAL_START, "FSM");
+                        }
                     }
                 }
 
@@ -126,7 +132,12 @@ namespace ego_planner {
                     changeFSMExecState(EXEC_TRAJ, "FSM");
                     flag_escape_emergency_ = true;
                 } else {
-                    changeFSMExecState(GEN_NEW_TRAJ, "FSM"); // "changeFSMExecState" must be called each time planned
+                    if (continously_called_times_ > 2) {
+                        changeFSMExecState(SEARCH_ESCAPE, "FSM");
+                        flag_escape_emergency_ = true;
+                    } else {
+                        changeFSMExecState(GEN_NEW_TRAJ, "FSM");
+                    }
                 }
                 break;
             }
@@ -136,7 +147,13 @@ namespace ego_planner {
                 if (planFromLocalTraj(1)) {
                     changeFSMExecState(EXEC_TRAJ, "FSM");
                 } else {
-                    changeFSMExecState(REPLAN_TRAJ, "FSM");
+                    if ((planner_manager_->pp_.drone_type == 0 && continously_called_times_ > 10) ||
+                        // 3D A* search takes more time
+                        (planner_manager_->pp_.drone_type > 0 && continously_called_times_ > 100)) {
+                        changeFSMExecState(EMERGENCY_STOP, "FSM");
+                    } else {
+                        changeFSMExecState(REPLAN_TRAJ, "FSM");
+                    }
                 }
 
                 break;
@@ -199,6 +216,173 @@ namespace ego_planner {
                 flag_escape_emergency_ = false;
                 break;
             }
+
+            case SEARCH_ESCAPE: {
+                Eigen::Vector3d path_start = odom_pos_;
+                Eigen::Vector3d path_end = final_goal_;
+                if (planner_manager_->pp_.drone_type == 0) {
+                    // for aerial robots try 3D BFMT using OMPL
+                    if (continously_called_times_ <= 1) {
+                        ompl_xy_range_ = 10;
+                        ompl_z_range_offset_ = 0.1;
+                    }
+                    double z_lb = min(path_start(2), path_end(2)) - ompl_z_range_offset_;
+                    double z_ub = max(path_start(2), path_end(2)) + ompl_z_range_offset_;
+                    bool ompl_success = planner_manager_->omplSearchPath(path_start, path_end, ompl_xy_range_, z_lb,
+                                                                         z_ub, 0.009, true, esc_raw_wps_);
+                    if (ompl_success) {
+                        esc_trap_has_started_ = false;
+                        changeFSMExecState(ESCAPE_TRAP, "FSM");
+                    } else {
+                        ompl_xy_range_ += 2;
+                        ompl_z_range_offset_ += 0.2;
+                        changeFSMExecState(SEARCH_ESCAPE, "FSM");
+                        if (continously_called_times_ > 50) {
+                            ROS_ERROR("Failed OMPL search too many times, is the goal reachable?");
+                            have_target_ = false;
+                            have_trigger_ = false;
+                            changeFSMExecState(WAIT_TARGET, "FSM");
+                        }
+                    }
+                } else {
+                    // for ground robots try 2D A* search
+                    bool astar_success = planner_manager_->astarSearchPath(path_start, path_end,
+                                                                           true, false,
+                                                                           esc_raw_wps_);
+                    if (astar_success) {
+                        // nice, we have found a 2D path to the target xy location
+                        esc_trap_has_started_ = false;
+                        changeFSMExecState(ESCAPE_TRAP, "FSM");
+                    } else {
+                        ROS_ERROR("Failed A* search, is the goal reachable? Give it another try maybe.");
+                        have_target_ = false;
+                        have_trigger_ = false;
+                        changeFSMExecState(WAIT_TARGET, "FSM");
+                    }
+                }
+                break;
+            }
+
+            case ESCAPE_TRAP: {
+
+                if (!esc_trap_has_started_) {
+                    /*** in this phase, we will first try to plan a trajectory to the first esc waypoint ***/
+
+                    // execute the following only once
+                    if (continously_called_times_ <= 1) {
+                        getEscWps(true);
+                        final_goal_backup_ = final_goal_;
+                        rdp_eps_original_ = rdp_eps_;
+                        esc_wp_id_ = 0;
+                    }
+
+                    // try plan to the first esc waypoint
+                    final_goal_ = esc_wps_[esc_wp_id_];
+                    if (planFromGlobalTraj(10)) {
+                        esc_trap_has_started_ = true;
+                        rdp_eps_ = rdp_eps_original_;
+                    }
+
+                    // no success, retry, and go to WAIT_TARGET if failed for too many times
+                    if (continously_called_times_ < 100) {
+                        changeFSMExecState(ESCAPE_TRAP, "FSM");
+                        rdp_eps_ -= 0.05;
+                        if (rdp_eps_ < 0.1)
+                            rdp_eps_ = 0.1;
+                        getEscWps(true);
+                    } else {
+                        ROS_ERROR("Failed to plan the first escape step.");
+                        have_target_ = false;
+                        have_trigger_ = false;
+                        changeFSMExecState(WAIT_TARGET, "FSM");
+                    }
+                } else {
+                    /*** in this case, we are already following the first esc trajectory ***/
+
+                    // variables for checking replan
+                    LocalTrajData *info = &planner_manager_->traj_.local_traj;
+                    double t_cur = ros::Time::now().toSec() - info->start_time;
+                    t_cur = min(info->duration, t_cur);
+
+                    const PtsChk_t *chk_ptr = &planner_manager_->traj_.local_traj.pts_chk;
+                    bool close_to_current_traj_end = (chk_ptr->size() >= 1 && chk_ptr->back().size() >= 1) ?
+                                                     chk_ptr->back().back().first - t_cur < emergency_time_ : 0;
+
+                    if (planner_manager_->grid_map_->getInflateOccupancy(final_goal_) || esc_new_guide_replan_) {
+                        // replan case 1: current goal is in collision -> need to get a new guiding path
+                        Eigen::Vector3d path_start = odom_pos_;
+                        Eigen::Vector3d path_end = final_goal_backup_;
+
+                        bool search_path_success = false;
+                        if (planner_manager_->pp_.drone_type == 0) {
+                            // for copter, call sampling based search
+                            double z_lb = min(path_start(2), path_end(2)) - ompl_z_range_offset_;
+                            double z_ub = max(path_start(2), path_end(2)) + ompl_z_range_offset_;
+                            search_path_success = planner_manager_->omplSearchPath(path_start, path_end,
+                                                                                   ompl_xy_range_, z_lb, z_ub,
+                                                                                   0.007, true,
+                                                                                   esc_raw_wps_);
+                        } else {
+                            // for ground robots, call A*
+                            search_path_success = planner_manager_->astarSearchPath(path_start, path_end,
+                                                                                    true, false,
+                                                                                    esc_raw_wps_);
+                        }
+
+                        if (search_path_success) {
+                            // new wps are generated
+                            getEscWps(true);
+                            esc_wp_id_ = 0;
+                            final_goal_ = esc_wps_[esc_wp_id_];
+                            planFromLocalTraj(1);
+                            changeFSMExecState(ESCAPE_TRAP, "FSM");
+                        } else {
+                            // TODO: change params for path searching to avoid failure
+                            final_goal_ = final_goal_backup_;
+                            changeFSMExecState(EMERGENCY_STOP, "FSM");
+                        }
+                        esc_new_guide_replan_ = false;
+                    } else {
+                        // case 2: close to the end of the current trajectory or esc waypoint -> next guiding waypoint
+                        if ((odom_pos_ - final_goal_).norm() < 2 * planner_manager_->pp_.max_vel_ ||
+                            close_to_current_traj_end) {
+                            // goal waypoint id ++
+                            esc_wp_id_ += 1;
+                            if (esc_wp_id_ > esc_wps_.size() - 1)
+                                esc_wp_id_ = esc_wps_.size() - 1;
+
+                            // if it is the last guiding point, plan to the real final goal, if success -> EXEC_TRAJ
+                            if (esc_wp_id_ == esc_wps_.size() - 1) {
+                                final_goal_ = final_goal_backup_;
+                                if (planFromLocalTraj(1))
+                                    changeFSMExecState(EXEC_TRAJ, "FSM");
+                                else {
+                                    esc_new_guide_replan_ = true;
+                                    changeFSMExecState(ESCAPE_TRAP, "FSM");
+                                }
+                            } else {
+                                // plan to next waypoint
+                                final_goal_ = esc_wps_[esc_wp_id_];
+                                if (!planFromLocalTraj(1)) {
+                                    esc_new_guide_replan_ = true;
+                                }
+                                changeFSMExecState(ESCAPE_TRAP, "FSM");
+                            }
+                        }
+                        // case 3: replan interval -> no change of goal, just replan
+                        if (t_cur > replan_thresh_) {
+
+                            if (!planFromLocalTraj(1)) {
+                                esc_new_guide_replan_ = true;
+                            }
+                            changeFSMExecState(ESCAPE_TRAP, "FSM");
+                        }
+                    }
+
+                    break;
+                }
+
+            }
         }
 
         data_disp_.header.stamp = ros::Time::now();
@@ -215,8 +399,8 @@ namespace ego_planner {
         else
             continously_called_times_ = 1;
 
-        static string state_str[8] = {"INIT", "WAIT_TARGET", "GEN_NEW_TRAJ", "REPLAN_TRAJ", "EXEC_TRAJ",
-                                      "EMERGENCY_STOP", "SEQUENTIAL_START"};
+        static string state_str[10] = {"INIT", "WAIT_TARGET", "GEN_NEW_TRAJ", "REPLAN_TRAJ", "EXEC_TRAJ",
+                                       "EMERGENCY_STOP", "SEQUENTIAL_START", "SEARCH_ESCAPE", "ESCAPE_TRAP"};
         int pre_s = int(exec_state_);
         exec_state_ = new_state;
         cout << "[" + pos_call + "]"
@@ -225,8 +409,8 @@ namespace ego_planner {
     }
 
     void EGOReplanFSM::printFSMExecState() {
-        static string state_str[8] = {"INIT", "WAIT_TARGET", "GEN_NEW_TRAJ", "REPLAN_TRAJ", "EXEC_TRAJ",
-                                      "EMERGENCY_STOP", "SEQUENTIAL_START"};
+        static string state_str[10] = {"INIT", "WAIT_TARGET", "GEN_NEW_TRAJ", "REPLAN_TRAJ", "EXEC_TRAJ",
+                                       "EMERGENCY_STOP", "SEQUENTIAL_START", "SEARCH_ESCAPE", "ESCAPE_TRAP"};
 
         cout << "\r[FSM]: state: " + state_str[int(exec_state_)] << ", Drone:" << planner_manager_->pp_.drone_id;
 
@@ -332,16 +516,22 @@ namespace ego_planner {
                     if (planFromLocalTraj()) // Make a chance
                     {
                         ROS_INFO("Plan success when detect collision. %f", t / info->duration);
-                        changeFSMExecState(EXEC_TRAJ, "SAFETY");
+                        if (exec_state_ != ESCAPE_TRAP)
+                            changeFSMExecState(EXEC_TRAJ, "SAFETY");
                         return;
                     } else {
                         if (t - t_cur < emergency_time_) // 0.8s of emergency time
                         {
+                            if (exec_state_ == ESCAPE_TRAP)
+                                final_goal_ = final_goal_backup_;
                             ROS_WARN("Emergency stop! time=%f", t - t_cur);
                             changeFSMExecState(EMERGENCY_STOP, "SAFETY");
                         } else {
                             ROS_WARN("current traj in collision, replan.");
-                            changeFSMExecState(REPLAN_TRAJ, "SAFETY");
+                            if (exec_state_ != ESCAPE_TRAP)
+                                changeFSMExecState(REPLAN_TRAJ, "SAFETY");
+                            else
+                                esc_new_guide_replan_ = true;
                         }
                         return;
                     }
@@ -371,6 +561,11 @@ namespace ego_planner {
                 planning_horizen_, start_pt_, final_goal_,
                 local_target_pt_, local_target_vel_,
                 touch_goal_);
+
+        if (!touch_goal_ && exec_state_ == ESCAPE_TRAP && !esc_trap_has_started_) {
+            local_target_pt_ = final_goal_;
+            local_target_vel_ = (local_target_pt_ - odom_pos_).normalized() * planner_manager_->pp_.max_vel_ * 0.5;
+        }
 
         bool plan_success = planner_manager_->reboundReplan(
                 start_pt_, start_vel_, start_acc_,
@@ -418,10 +613,16 @@ namespace ego_planner {
         LocalTrajData *info = &planner_manager_->traj_.local_traj;
         double t_cur = ros::Time::now().toSec() - info->start_time;
 
-        start_pt_ = info->traj.getPos(t_cur);
-        start_vel_ = info->traj.getVel(t_cur);
-        start_acc_ = info->traj.getAcc(t_cur);
-
+        if (planner_manager_->pp_.drone_type != 2) {
+            start_pt_ = info->traj.getPos(t_cur);
+            start_vel_ = info->traj.getVel(t_cur);
+            start_acc_ = info->traj.getAcc(t_cur);
+        } else {
+            // use MPC
+            start_pt_ = odom_pos_;
+            start_vel_ = odom_vel_;
+            start_acc_ = info->traj.getAcc(t_cur);
+        }
         bool success = callReboundReplan(false, false);
 
         if (!success) {
@@ -467,7 +668,7 @@ namespace ego_planner {
 
             /*** FSM ***/
             if (exec_state_ != WAIT_TARGET) {
-                while (exec_state_ != EXEC_TRAJ) {
+                while (exec_state_ != EXEC_TRAJ && !esc_trap_has_started_) {
                     ros::spinOnce();
                     ros::Duration(0.001).sleep();
                 }
@@ -509,6 +710,64 @@ namespace ego_planner {
         return false;
     }
 
+    double EGOReplanFSM::distPoint2Line(const Eigen::Vector3d &point, const Eigen::Vector3d &line_start,
+                                        const Eigen::Vector3d &line_end) {
+        Eigen::Vector3d line = line_end - line_start;
+        double line_norm = line.norm();
+        if (line_norm < 1e-6) {
+            return (point - line_start).norm();
+        } else {
+            return line.cross(point - line_start).norm() / line_norm;
+        }
+    }
+
+    void EGOReplanFSM::RamerDouglasPeucker(const std::vector<Eigen::Vector3d> &curve, double eps, size_t start_idx,
+                                           size_t end_idx, std::vector<Eigen::Vector3d> &simplified_curve) {
+        // base case: the curve is already a line
+        if (end_idx <= start_idx + 1) {
+            simplified_curve.push_back(curve[start_idx]);
+            if (end_idx > start_idx)
+                simplified_curve.push_back(curve[end_idx]);
+            return;
+        }
+
+        // recursive case
+        double max_dist = 0;
+        size_t max_dist_idx = start_idx;
+        for (size_t i = start_idx + 1; i < end_idx; i++) {
+            double dist = distPoint2Line(curve[i], curve[start_idx], curve[end_idx]);
+            if (dist > max_dist) {
+                max_dist = dist;
+                max_dist_idx = i;
+            }
+        }
+        if (max_dist > eps) {
+            RamerDouglasPeucker(curve, eps, start_idx, max_dist_idx, simplified_curve);
+            RamerDouglasPeucker(curve, eps, max_dist_idx, end_idx, simplified_curve);
+        } else {
+            simplified_curve.push_back(curve[start_idx]);
+            simplified_curve.push_back(curve[end_idx]);
+        }
+    }
+
+    void EGOReplanFSM::getEscWps(bool do_visualize) {
+        vector<Eigen::Vector3d> rdp_pts;
+        RamerDouglasPeucker(esc_raw_wps_, rdp_eps_, 0, esc_raw_wps_.size() - 1, rdp_pts);
+
+        esc_wps_.clear();
+        for (size_t i = 0; i < rdp_pts.size(); i++) {
+            if (i % 2 != 0) {
+                esc_wps_.push_back(rdp_pts[i]);
+            }
+        }
+
+        if (do_visualize) {
+            vector<vector<Eigen::Vector3d>> astar_list;
+            astar_list.push_back(esc_wps_);
+            visualization_->displayAStarList(astar_list, planner_manager_->pp_.drone_id);
+        }
+    }
+
     void EGOReplanFSM::waypointCallback(const quadrotor_msgs::GoalSetPtr &msg) {
         if (msg->drone_id != planner_manager_->pp_.drone_id || msg->goal[2] < -0.1)
             return;
@@ -516,6 +775,12 @@ namespace ego_planner {
         ROS_INFO("Received goal: %f, %f, %f", msg->goal[0], msg->goal[1], msg->goal[2]);
 
         Eigen::Vector3d end_wp(msg->goal[0], msg->goal[1], msg->goal[2]);
+
+        if (planner_manager_->pp_.drone_type > 0) {
+            end_wp(2) = odom_pos_(2);
+            ROS_INFO("Goal modified to: %f, %f, %f as drone type is %d",
+                     msg->goal[0], msg->goal[1], odom_pos_(2), planner_manager_->pp_.drone_type);
+        }
         if (planNextWaypoint(end_wp)) {
             have_trigger_ = true;
         }
@@ -665,6 +930,9 @@ namespace ego_planner {
             planner_manager_->traj_.swarm_traj[recv_id].duration = trajectory.getTotalDuration();
             planner_manager_->traj_.swarm_traj[recv_id].start_pos = trajectory.getPos(0.0);
             planner_manager_->traj_.swarm_traj[recv_id].des_clearance = msg->des_clearance;
+            planner_manager_->traj_.swarm_traj[recv_id].drone_type = msg->drone_type;
+            planner_manager_->traj_.swarm_traj[recv_id].body_height = msg->body_height;
+            planner_manager_->traj_.swarm_traj[recv_id].body_radius = msg->body_radius;
 
             /* Check Collision */
             if (planner_manager_->checkCollision(recv_id)) {
@@ -720,6 +988,10 @@ namespace ego_planner {
         MINCO_msg.order = 5; // todo, only support order = 5 now.
         MINCO_msg.duration.resize(piece_num);
         MINCO_msg.des_clearance = planner_manager_->getSwarmClearance();
+        MINCO_msg.drone_type = planner_manager_->pp_.drone_type;
+        MINCO_msg.body_height = planner_manager_->pp_.body_height;
+        MINCO_msg.body_radius = planner_manager_->pp_.body_radius;
+
         Eigen::Vector3d vec;
         vec = data->traj.getPos(0);
         MINCO_msg.start_p[0] = vec(0), MINCO_msg.start_p[1] = vec(1), MINCO_msg.start_p[2] = vec(2);

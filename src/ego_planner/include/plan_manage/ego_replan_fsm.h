@@ -45,7 +45,9 @@ namespace ego_planner {
             REPLAN_TRAJ,
             EXEC_TRAJ,
             EMERGENCY_STOP,
-            SEQUENTIAL_START
+            SEQUENTIAL_START,
+            SEARCH_ESCAPE,
+            ESCAPE_TRAP
         };
         enum TARGET_TYPE {
             MANUAL_TARGET = 1,
@@ -69,16 +71,21 @@ namespace ego_planner {
         bool enable_fail_safe_;
         bool enable_ground_height_measurement_;
         bool flag_escape_emergency_;
+        double auto_start_delay_sec_;
+        double rdp_eps_, rdp_eps_original_;
+        bool esc_trap_has_started_, esc_new_guide_replan_;
+        double ompl_xy_range_, ompl_z_range_offset_;
+        size_t esc_wp_id_;
 
         bool have_trigger_, have_target_, have_odom_, have_new_target_, have_recv_pre_agent_, touch_goal_, mandatory_stop_;
         FSM_EXEC_STATE exec_state_;
         int continously_called_times_{0};
 
         Eigen::Vector3d start_pt_, start_vel_, start_acc_;   // start state
-        Eigen::Vector3d final_goal_;                             // goal state
+        Eigen::Vector3d final_goal_, final_goal_backup_;     // goal state
         Eigen::Vector3d local_target_pt_, local_target_vel_; // local target state
         Eigen::Vector3d odom_pos_, odom_vel_, odom_acc_;     // odometry state
-        std::vector<Eigen::Vector3d> wps_;
+        std::vector<Eigen::Vector3d> wps_, esc_raw_wps_, esc_wps_;
 
         /* ROS utils */
         ros::NodeHandle node_;
@@ -115,6 +122,15 @@ namespace ego_planner {
         bool planNextWaypoint(const Eigen::Vector3d next_wp);
 
         bool mondifyInCollisionFinalGoal();
+
+        static double distPoint2Line(const Eigen::Vector3d &point, const Eigen::Vector3d &line_start,
+                                     const Eigen::Vector3d &line_end);
+
+        static void
+        RamerDouglasPeucker(const std::vector<Eigen::Vector3d> &curve, double eps, size_t start_idx, size_t end_idx,
+                            std::vector<Eigen::Vector3d> &simplified_curve);
+
+        void getEscWps(bool do_visualize);
 
         /* input-output */
         void mandatoryStopCallback(const std_msgs::Empty &msg);

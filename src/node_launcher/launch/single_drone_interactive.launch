@@ -8,6 +8,8 @@
           args="-d $(find node_launcher)/config/default.rviz"
     />
 
+    <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
+
     <!-- map -->
     <node pkg="simulator" name="random_forest" type="random_forest_sensing" output="screen">
         <param name="map/x_size" value="26"/>
@@ -40,6 +42,7 @@
         <arg name="map_size_z" value="$(arg map_size_z)"/>
         <arg name="odom_topic" value="$(arg odom_topic)"/>
         <arg name="flight_type" value="1"/>
+        <arg name="drone_type" value="0"/>
     </include>
 
 

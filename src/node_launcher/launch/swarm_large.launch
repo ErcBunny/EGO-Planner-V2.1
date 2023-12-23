@@ -7,7 +7,7 @@
     <node name="rviz" pkg="rviz" type="rviz"
           args="-d $(find node_launcher)/config/default.rviz"
     />
-    
+
     <!-- swarm topic transmitter bridge-->
     <include file="$(find ego_planner)/launch/bridge_udp.launch">
         <arg name="drone_id" value="999"/>

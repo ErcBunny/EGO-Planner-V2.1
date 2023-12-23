@@ -11,6 +11,7 @@ ros::Publisher _odom_pub;
 
 quadrotor_msgs::PositionCommand _cmd;
 double _init_x, _init_y, _init_z;
+int drone_type_;
 
 bool rcv_cmd = false;
 
@@ -29,8 +30,12 @@ void pubOdom() {
         odom.pose.pose.position.y = _cmd.position.y;
         odom.pose.pose.position.z = _cmd.position.z;
 
-        Eigen::Vector3d alpha = Eigen::Vector3d(_cmd.acceleration.x, _cmd.acceleration.y, _cmd.acceleration.z) +
-                                9.8 * Eigen::Vector3d(0, 0, 1);
+        Eigen::Vector3d alpha;
+        if (drone_type_ == 0)
+            alpha = Eigen::Vector3d(_cmd.acceleration.x, _cmd.acceleration.y, _cmd.acceleration.z) +
+                    9.8 * Eigen::Vector3d(0, 0, 1);
+        else
+            alpha = 9.8 * Eigen::Vector3d(0, 0, 1);
         Eigen::Vector3d xC(cos(_cmd.yaw), sin(_cmd.yaw), 0);
         Eigen::Vector3d yC(-sin(_cmd.yaw), cos(_cmd.yaw), 0);
         Eigen::Vector3d xB = (yC.cross(alpha)).normalized();
@@ -82,6 +87,7 @@ int main(int argc, char **argv) {
     nh.param("init_x", _init_x, 0.0);
     nh.param("init_y", _init_y, 0.0);
     nh.param("init_z", _init_z, 0.0);
+    nh.param("drone_type", drone_type_, 0);
 
     _cmd_sub = nh.subscribe("command", 1, rcvPosCmdCallBack);
     _odom_pub = nh.advertise<nav_msgs::Odometry>("odometry", 1);

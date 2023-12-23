@@ -81,7 +81,7 @@ void RandomMapGenerate() {
         x = rand_x(eng);
         y = rand_y(eng);
         w = rand_w(eng);
-        
+
         x = floor(x / _resolution) * _resolution + _resolution / 2.0;
         y = floor(y / _resolution) * _resolution + _resolution / 2.0;
 

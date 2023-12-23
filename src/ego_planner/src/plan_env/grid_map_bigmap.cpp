@@ -556,7 +556,7 @@ void GridMap::clearAndInflateLocalMap() {
         ROS_ERROR(
                 "Inflation is too big, which will cause siginificant computation! Reduce inflation or enlarge resolution.");
     }
-    vector <Eigen::Vector3i> inf_pts(pow(2 * inf_step + 1, 3));
+    vector<Eigen::Vector3i> inf_pts(pow(2 * inf_step + 1, 3));
     // inf_pts.resize(4 * inf_step + 3);
     Eigen::Vector3i inf_pt;
 
@@ -706,7 +706,7 @@ void GridMap::odomCallback(const nav_msgs::OdometryConstPtr &odom) {
 
 void GridMap::cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img) {
 
-    pcl::PointCloud <pcl::PointXYZ> latest_cloud;
+    pcl::PointCloud<pcl::PointXYZ> latest_cloud;
     pcl::fromROSMsg(*img, latest_cloud);
 
     md_.has_cloud_ = true;
@@ -808,7 +808,7 @@ void GridMap::publishMap() {
         return;
 
     pcl::PointXYZ pt;
-    pcl::PointCloud <pcl::PointXYZ> cloud;
+    pcl::PointCloud<pcl::PointXYZ> cloud;
 
     Eigen::Vector3i min_cut = md_.local_bound_min_;
     Eigen::Vector3i max_cut = md_.local_bound_max_;
@@ -853,7 +853,7 @@ void GridMap::publishMapInflate(bool all_info) {
         return;
 
     pcl::PointXYZ pt;
-    pcl::PointCloud <pcl::PointXYZ> cloud;
+    pcl::PointCloud<pcl::PointXYZ> cloud;
 
     Eigen::Vector3i min_cut = md_.local_bound_min_;
     Eigen::Vector3i max_cut = md_.local_bound_max_;

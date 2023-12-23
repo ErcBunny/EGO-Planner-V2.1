@@ -25,7 +25,7 @@ namespace ego_planner {
 
     // // real ids used: {id, id+1000}
     void
-    PlanningVisualization::displayMarkerList(ros::Publisher &pub, const vector <Eigen::Vector3d> &list, double scale,
+    PlanningVisualization::displayMarkerList(ros::Publisher &pub, const vector<Eigen::Vector3d> &list, double scale,
                                              Eigen::Vector4d color, int id, bool show_sphere /* = true */ ) {
         visualization_msgs::Marker sphere, line_strip;
         sphere.header.frame_id = line_strip.header.frame_id = "world";
@@ -59,7 +59,7 @@ namespace ego_planner {
 
     // real ids used: {id, id+1}
     void PlanningVisualization::generatePathDisplayArray(visualization_msgs::MarkerArray &array,
-                                                         const vector <Eigen::Vector3d> &list, double scale,
+                                                         const vector<Eigen::Vector3d> &list, double scale,
                                                          Eigen::Vector4d color, int id) {
         visualization_msgs::Marker sphere, line_strip;
         sphere.header.frame_id = line_strip.header.frame_id = "world";
@@ -93,7 +93,7 @@ namespace ego_planner {
 
     // real ids used: {1000*id ~ (arrow nums)+1000*id}
     void PlanningVisualization::generateArrowDisplayArray(visualization_msgs::MarkerArray &array,
-                                                          const vector <Eigen::Vector3d> &list, double scale,
+                                                          const vector<Eigen::Vector3d> &list, double scale,
                                                           Eigen::Vector4d color, int id) {
         visualization_msgs::Marker arrow;
         arrow.header.frame_id = "world";
@@ -157,7 +157,7 @@ namespace ego_planner {
         goal_point_pub.publish(sphere);
     }
 
-    void PlanningVisualization::displayGlobalPathList(vector <Eigen::Vector3d> init_pts, const double scale, int id) {
+    void PlanningVisualization::displayGlobalPathList(vector<Eigen::Vector3d> init_pts, const double scale, int id) {
 
         if (global_list_pub.getNumSubscribers() == 0) {
             return;
@@ -168,7 +168,7 @@ namespace ego_planner {
     }
 
     void
-    PlanningVisualization::displayMultiInitPathList(vector <vector<Eigen::Vector3d>> init_trajs, const double scale) {
+    PlanningVisualization::displayMultiInitPathList(vector<vector<Eigen::Vector3d>> init_trajs, const double scale) {
 
         if (init_list_pub.getNumSubscribers() == 0) {
             return;
@@ -178,7 +178,7 @@ namespace ego_planner {
 
         for (int id = 0; id < last_nums; id++) {
             Eigen::Vector4d color(0, 0, 0, 0);
-            vector <Eigen::Vector3d> blank;
+            vector<Eigen::Vector3d> blank;
             displayMarkerList(init_list_pub, blank, scale, color, id, false);
             ros::Duration(0.001).sleep();
         }
@@ -193,7 +193,7 @@ namespace ego_planner {
 
     }
 
-    void PlanningVisualization::displayInitPathList(vector <Eigen::Vector3d> init_pts, const double scale, int id) {
+    void PlanningVisualization::displayInitPathList(vector<Eigen::Vector3d> init_pts, const double scale, int id) {
 
         if (init_list_pub.getNumSubscribers() == 0) {
             return;
@@ -203,7 +203,7 @@ namespace ego_planner {
         displayMarkerList(init_list_pub, init_pts, scale, color, id);
     }
 
-    void PlanningVisualization::displayMultiOptimalPathList(vector <vector<Eigen::Vector3d>> optimal_trajs,
+    void PlanningVisualization::displayMultiOptimalPathList(vector<vector<Eigen::Vector3d>> optimal_trajs,
                                                             const double scale) // zxzxzx
     {
 
@@ -215,7 +215,7 @@ namespace ego_planner {
 
         for (int id = 0; id < last_nums; id++) {
             Eigen::Vector4d color(0, 0, 0, 0);
-            vector <Eigen::Vector3d> blank;
+            vector<Eigen::Vector3d> blank;
             displayMarkerList(optimal_list_pub, blank, scale, color, id + 10, false);
             ros::Duration(0.001).sleep();
         }
@@ -236,7 +236,7 @@ namespace ego_planner {
             return;
         }
 
-        vector <Eigen::Vector3d> list;
+        vector<Eigen::Vector3d> list;
         for (int i = 0; i < optimal_pts.cols(); i++) {
             Eigen::Vector3d pt = optimal_pts.col(i).transpose();
             list.push_back(pt);
@@ -251,7 +251,7 @@ namespace ego_planner {
             return;
         }
 
-        vector <Eigen::Vector3d> list;
+        vector<Eigen::Vector3d> list;
         for (int i = 0; i < failed_pts.cols(); i++) {
             Eigen::Vector3d pt = failed_pts.col(i).transpose();
             list.push_back(pt);
@@ -260,7 +260,7 @@ namespace ego_planner {
         displayMarkerList(failed_list_pub, list, 0.15, color, id);
     }
 
-    void PlanningVisualization::displayAStarList(std::vector <std::vector<Eigen::Vector3d>> a_star_paths,
+    void PlanningVisualization::displayAStarList(std::vector<std::vector<Eigen::Vector3d>> a_star_paths,
                                                  int id /* = Eigen::Vector4d(0.5,0.5,0,1)*/) {
 
         if (a_star_list_pub.getNumSubscribers() == 0) {
@@ -268,7 +268,7 @@ namespace ego_planner {
         }
 
         int i = 0;
-        vector <Eigen::Vector3d> list;
+        vector<Eigen::Vector3d> list;
 
         Eigen::Vector4d color = Eigen::Vector4d(0.5 + ((double) rand() / RAND_MAX / 2),
                                                 0.5 + ((double) rand() / RAND_MAX / 2), 0,
@@ -288,7 +288,7 @@ namespace ego_planner {
     }
 
     void
-    PlanningVisualization::displayArrowList(ros::Publisher &pub, const vector <Eigen::Vector3d> &list, double scale,
+    PlanningVisualization::displayArrowList(ros::Publisher &pub, const vector<Eigen::Vector3d> &list, double scale,
                                             Eigen::Vector4d color, int id) {
         visualization_msgs::MarkerArray array;
         // clear
@@ -301,7 +301,7 @@ namespace ego_planner {
 
     void PlanningVisualization::displayIntermediatePt(std::string type, Eigen::MatrixXd &pts, int id,
                                                       Eigen::Vector4d color) {
-        std::vector <Eigen::Vector3d> pts_;
+        std::vector<Eigen::Vector3d> pts_;
         pts_.reserve(pts.cols());
         for (int i = 0; i < pts.cols(); i++) {
             pts_.emplace_back(pts.col(i));
@@ -320,7 +320,7 @@ namespace ego_planner {
             ROS_ERROR("pts.cols() != grad.cols()");
             return;
         }
-        std::vector <Eigen::Vector3d> arrow_;
+        std::vector<Eigen::Vector3d> arrow_;
         arrow_.reserve(pts.cols() * 2);
         if (!type.compare("swarm")) {
             for (int i = 0; i < pts.cols(); i++) {

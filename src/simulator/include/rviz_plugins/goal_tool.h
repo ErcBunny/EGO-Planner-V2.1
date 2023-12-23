@@ -48,7 +48,7 @@ namespace rviz {
     class StringProperty;
 
     class Goal3DTool : public Pose3DTool {
-        Q_OBJECT
+    Q_OBJECT
     public:
         Goal3DTool();
 
@@ -61,7 +61,8 @@ namespace rviz {
 
     private
         Q_SLOTS:
-                void updateTopic();
+
+        void updateTopic();
 
     private:
         ros::NodeHandle nh_;

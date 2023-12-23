@@ -1,0 +1,84 @@
+<launch>
+    <arg name="map_size_x" value="200.0"/>
+    <arg name="map_size_y" value="200.0"/>
+    <arg name="map_size_z" value=" 3.0"/>
+    <arg name="odom_topic" value="visual_slam/odom"/>
+
+    <arg name="mesh_sampling_points" default="1000000"/>
+    <arg name="global_pcd_downsample_voxel_size" default="0.1"/>
+    <arg name="global_pcd_publish_topic" default="/map_generator/global_cloud"/>
+    <arg name="global_pcd_reference_frame" default="world"/>
+    <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/17DRP5sb8fy.glb"/>
+
+    <node name="rviz" pkg="rviz" type="rviz"
+          args="-d $(find node_launcher)/config/habitat.rviz"
+    />
+
+    <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
+
+    <!-- map -->
+    <node pkg="simulator" name="habitat_scene" type="scene_mesh_to_pcd.py" output="screen">
+        <param name="mesh_sampling_points" type="int" value="$(arg mesh_sampling_points)"/>
+        <param name="global_pcd_downsample_voxel_size" type="double" value="$(arg global_pcd_downsample_voxel_size)"/>
+        <param name="global_pcd_publish_topic" type="str" value="$(arg global_pcd_publish_topic)"/>
+        <param name="global_pcd_reference_frame" type="str" value="$(arg global_pcd_reference_frame)"/>
+        <param name="scene_id" type="str" value="$(arg scene_id)"/>
+    </node>
+
+    <include file="$(find node_launcher)/launch/include/run_in_habitat.xml">
+        <arg name="drone_id" value="0"/>
+        <arg name="init_x" value="0.0"/>
+        <arg name="init_y" value="0.0"/>
+        <arg name="init_z" value="0.0"/>                    <!-- important -->
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+        <arg name="flight_type" value="1"/>
+
+        <arg name="local_map_update_range_x" value="5.5"/>
+        <arg name="local_map_update_range_y" value="5.5"/>
+        <arg name="local_map_update_range_z" value="5.5"/>
+        <arg name="map_fading_time" value="-1"/>
+
+        <arg name="max_vel" value="1.0"/>
+        <arg name="max_acc" value="6.0"/>
+        <arg name="max_jer" value="20.0"/>
+
+        <arg name="enable_angular_constraints" value="0"/>
+        <arg name="max_angular_vel" value="1"/>
+        <arg name="max_angular_acc" value="2"/>
+
+        <arg name="drone_type" value="2"/>                  <!-- important -->
+
+        <arg name="auto_start_delay_sec" value="5"/>
+        <arg name="constraint_points_perPiece" value="5"/>
+        <arg name="rdp_eps" value="0.3"/>
+
+        <!-- for traj server -->
+        <arg name="diffdrive_use_mpc" value="1"/>
+        <arg name="cmd_vel_thresh" value="0.00"/>
+
+        <!-- habitat_sim -->
+        <arg name="agent_type" value="terrestrial"/>             <!-- important -->
+        <arg name="agent_height" value="1.5"/>
+        <arg name="agent_radius" value="0.2"/>
+        <arg name="terrestrial_operating_height" value="0"/>
+        <arg name="crop_point_cloud_offset_gnd" value="0.05"/>
+        <arg name="crop_point_cloud_offset_top" value="0.05"/>
+        <arg name="frame_id_mesh" value="map"/>
+        <arg name="depth_img_trunc_meter" value="4"/>
+
+        <arg name="fps" value="30"/>
+        <arg name="image_height" value="480"/>
+        <arg name="image_width" value="640"/>
+        <arg name="image_hfov" value="90"/>
+        <arg name="camera_position_x" value="0"/>
+        <arg name="camera_position_y" value="0"/>
+        <arg name="camera_position_z" value="1"/>           <!-- important -->
+        <arg name="camera_orientation_x" value="0"/>
+        <arg name="camera_orientation_y" value="0"/>
+        <arg name="camera_orientation_z" value="0"/>
+    </include>
+
+</launch>

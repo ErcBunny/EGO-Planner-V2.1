@@ -21,6 +21,9 @@ namespace ego_planner {
         nh.param("manager/planning_horizon", pp_.planning_horizen_, 5.0);
         nh.param("manager/use_multitopology_trajs", pp_.use_multitopology_trajs, false);
         nh.param("manager/drone_id", pp_.drone_id, -1);
+        nh.param("manager/drone_type", pp_.drone_type, 0);
+        nh.param("manager/body_height", pp_.body_height, 0.0);
+        nh.param("manager/body_radius", pp_.body_radius, 0.0);
 
         grid_map_.reset(new GridMap);
         grid_map_->initMap(nh);
@@ -33,6 +36,8 @@ namespace ego_planner {
 
         ploy_traj_opt_->setSwarmTrajs(&traj_.swarm_traj);
         ploy_traj_opt_->setDroneId(pp_.drone_id);
+
+        ompl_search = new OMPLSearch(grid_map_);
     }
 
     bool EGOPlannerManager::reboundReplan(
@@ -62,7 +67,7 @@ namespace ego_planner {
         }
 
         Eigen::MatrixXd cstr_pts = initMJO.getInitConstraintPoints(ploy_traj_opt_->get_cps_num_prePiece_());
-        vector <std::pair<int, int>> segments;
+        vector<std::pair<int, int>> segments;
         if (ploy_traj_opt_->finelyCheckAndSetConstraintPoints(segments, initMJO, true) ==
             PolyTrajOptimizer::CHK_RET::ERR) {
             return false;
@@ -79,7 +84,7 @@ namespace ego_planner {
 
         /*** STEP 2: OPTIMIZE ***/
         bool flag_success = false;
-        vector <vector<Eigen::Vector3d>> vis_trajs;
+        vector<vector<Eigen::Vector3d>> vis_trajs;
         poly_traj::MinJerkOpt best_MJO;
 
         // ROS_ERROR("BBBB");
@@ -211,13 +216,21 @@ namespace ego_planner {
                         Eigen::Vector3d(0, 0, 1))).normalized();
                 Eigen::Vector3d vertical_dir = ((start_pt - local_target_pt).cross(horizen_dir)).normalized();
                 innerPs.resize(3, 1);
-                innerPs = (start_pt + local_target_pt) / 2 +
-                          (((double) rand()) / RAND_MAX - 0.5) *
-                          (start_pt - local_target_pt).norm() *
-                          horizen_dir * 0.8 * (-0.978 / (continous_failures_count_ + 0.989) + 0.989) +
-                          (((double) rand()) / RAND_MAX - 0.5) *
-                          (start_pt - local_target_pt).norm() *
-                          vertical_dir * 0.4 * (-0.978 / (continous_failures_count_ + 0.989) + 0.989);
+                if (pp_.drone_type == 0)
+                    // for aerial drone
+                    innerPs = (start_pt + local_target_pt) / 2 +
+                              (((double) rand()) / RAND_MAX - 0.5) *
+                              (start_pt - local_target_pt).norm() *
+                              horizen_dir * 0.8 * (-0.978 / (continous_failures_count_ + 0.989) + 0.989) +
+                              (((double) rand()) / RAND_MAX - 0.5) *
+                              (start_pt - local_target_pt).norm() *
+                              vertical_dir * 0.4 * (-0.978 / (continous_failures_count_ + 0.989) + 0.989);
+                else
+                    // for ground drone (omni-drive and diff-drive)
+                    innerPs = (start_pt + local_target_pt) / 2 +
+                              (((double) rand()) / RAND_MAX - 0.5) *
+                              (start_pt - local_target_pt).norm() *
+                              horizen_dir * 0.8 * (-0.978 / (continous_failures_count_ + 0.989) + 0.989);
 
                 piece_nums = 2;
                 piece_dur_vec.resize(2);
@@ -385,6 +398,50 @@ namespace ego_planner {
         }
 
         return false;
+    }
+
+    bool EGOPlannerManager::astarSearchPath(const Eigen::Vector3d &start_point, const Eigen::Vector3d &end_point,
+                                            bool disable_vertical_search, bool do_visualize,
+                                            std::vector<Eigen::Vector3d> &path_points) {
+        auto astar = ploy_traj_opt_->get_astar();
+        ASTAR_RET ret = astar->AstarSearch(
+                grid_map_->getResolution(),
+                start_point,
+                end_point,
+                disable_vertical_search
+        );
+
+        if (ret == ASTAR_RET::SUCCESS) {
+            path_points = astar->getPath();
+
+            if (do_visualize) {
+                vector<vector<Eigen::Vector3d>> astar_list;
+                astar_list.push_back(path_points);
+                visualization_->displayAStarList(astar_list, pp_.drone_id);
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool EGOPlannerManager::omplSearchPath(const Eigen::Vector3d &start_point, const Eigen::Vector3d &end_point,
+                                           double xy_range, double z_lb, double z_ub, double timeout, bool do_visualize,
+                                           std::vector<Eigen::Vector3d> &path_points) {
+        auto ret = ompl_search->searchPath(
+                start_point, end_point, xy_range, z_lb, z_ub, timeout, path_points
+        );
+        if (ret == ompl::base::PlannerStatus::StatusType::EXACT_SOLUTION) {
+            if (do_visualize) {
+                vector<vector<Eigen::Vector3d>> list;
+                list.push_back(path_points);
+                visualization_->displayAStarList(list, pp_.drone_id);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     bool EGOPlannerManager::planGlobalTrajWaypoints(

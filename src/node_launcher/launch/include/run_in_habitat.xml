@@ -1,0 +1,206 @@
+<launch>
+    <!-- size of map, change the size inflate x, y, z according to your application -->
+    <arg name="drone_id" default="0"/>
+    <arg name="map_size_x"/>
+    <arg name="map_size_y"/>
+    <arg name="map_size_z"/>
+    <arg name="init_x"/>
+    <arg name="init_y"/>
+    <arg name="init_z"/>
+    <arg name="flight_type" default="2"/>
+    <arg name="point_num" default="1"/>
+    <arg name="target0_x" default="0.0"/>
+    <arg name="target0_y" default="0.0"/>
+    <arg name="target0_z" default="0.0"/>
+    <arg name="target1_x" default="0.0"/>
+    <arg name="target1_y" default="0.0"/>
+    <arg name="target1_z" default="0.0"/>
+    <arg name="target2_x" default="0.0"/>
+    <arg name="target2_y" default="0.0"/>
+    <arg name="target2_z" default="0.0"/>
+    <arg name="target3_x" default="0.0"/>
+    <arg name="target3_y" default="0.0"/>
+    <arg name="target3_z" default="0.0"/>
+    <arg name="target4_x" default="0.0"/>
+    <arg name="target4_y" default="0.0"/>
+    <arg name="target4_z" default="0.0"/>
+
+    <!-- new in V2.1 start -->
+
+    <!-- range z: different meaning between grid_map.cpp and grid_map_bigmap.cpp -->
+    <arg name="local_map_update_range_x" default="5.5"/>
+    <arg name="local_map_update_range_y" default="5.5"/>
+    <arg name="local_map_update_range_z" default="5.5"/>
+    <!-- fading_time = -1: do not fade away -->
+    <arg name="map_fading_time" default="-1"/>
+
+    <arg name="max_vel" default="1.5"/>
+    <arg name="max_acc" default="6.0"/>
+    <arg name="max_jer" default="20.0"/>
+
+    <arg name="enable_angular_constraints" default="0"/>
+    <arg name="max_angular_vel" default="1"/>
+    <arg name="max_angular_acc" default="2"/>
+
+    <arg name="drone_type" default="0"/>
+
+    <arg name="auto_start_delay_sec" default="7"/>
+    <arg name="constraint_points_perPiece" default="5"/>
+    <arg name="rdp_eps" default="0.3"/>
+
+    <!-- for traj server -->
+    <arg name="diffdrive_use_mpc" default="1"/>
+    <arg name="cmd_vel_thresh" default="0.01"/>
+
+    <!-- habitat_sim -->
+    <arg name="gpu_device_id" default="-1"/>
+    <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/17DRP5sb8fy.glb"/>
+    <arg name="scene_dataset_config_file"
+         default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/mp3d.scene_dataset_config.json"/>
+
+    <arg name="agent_type" default="aerial"/>
+    <arg name="agent_height" default="1.5"/>
+    <arg name="agent_radius" default="0.1"/>
+    <arg name="terrestrial_operating_height" default="0"/>
+    <arg name="crop_point_cloud_offset_gnd" default="0.05"/>
+    <arg name="crop_point_cloud_offset_top" default="0.05"/>
+    <arg name="frame_id_mesh" default="map"/>
+    <arg name="depth_img_trunc_meter" default="4"/>
+
+    <arg name="fps" default="30"/>
+    <arg name="image_height" default="480"/>
+    <arg name="image_width" default="640"/>
+    <arg name="image_hfov" default="90"/>
+    <arg name="camera_position_x" default="0"/>
+    <arg name="camera_position_y" default="0"/>
+    <arg name="camera_position_z" default="0"/>
+    <arg name="camera_orientation_x" default="0"/>
+    <arg name="camera_orientation_y" default="0"/>
+    <arg name="camera_orientation_z" default="0"/>
+
+    <arg name="color_image_raw_topic" default="/drone_$(arg drone_id)_camera/color_raw"/>
+    <arg name="depth_image_raw_topic" default="/drone_$(arg drone_id)_camera/depth_raw"/>
+    <arg name="local_pcd_topic" default="/drone_$(arg drone_id)_pcl_render_node/cloud"/>
+    <arg name="local_pcd_aux_topic" default="/drone_$(arg drone_id)_pcl_render_node/cloud_aux"/>
+
+    <!-- new in V2.1 end -->
+
+    <arg name="odom_topic"/>
+    <!-- main algorithm params -->
+    <include file="$(find node_launcher)/launch/include/advanced_param.xml">
+        <arg name="drone_type" value="$(arg drone_type)"/>
+        <arg name="drone_id" value="$(arg drone_id)"/>
+        <arg name="body_height" value="$(arg agent_height)"/>
+        <arg name="body_radius" value="$(arg agent_radius)"/>
+        <arg name="map_size_x_" value="$(arg map_size_x)"/>
+        <arg name="map_size_y_" value="$(arg map_size_y)"/>
+        <arg name="map_size_z_" value="$(arg map_size_z)"/>
+        <arg name="local_map_update_range_x" value="$(arg local_map_update_range_x)"/>
+        <arg name="local_map_update_range_y" value="$(arg local_map_update_range_y)"/>
+        <arg name="local_map_update_range_z" value="$(arg local_map_update_range_z)"/>
+        <arg name="map_fading_time" value="$(arg map_fading_time)"/>
+        <arg name="odometry_topic" value="$(arg odom_topic)"/>
+        <!-- camera pose: transform of camera frame in the world frame -->
+        <!-- depth topic: depth image, 640x480 by default -->
+        <!-- don't set cloud_topic if you already set these ones! -->
+        <arg name="camera_pose_topic" value="pcl_render_node/camera_pose"/>
+        <arg name="depth_topic" value="pcl_render_node/depth"/>
+        <!-- topic of point cloud measurement, such as from LIDAR  -->
+        <!-- don't set camera pose and depth, if you already set this one! -->
+        <arg name="cloud_topic" value="pcl_render_node/cloud"/>
+        <!-- intrinsic params of the depth camera -->
+        <arg name="cx" value="321.04638671875"/>
+        <arg name="cy" value="243.44969177246094"/>
+        <arg name="fx" value="387.229248046875"/>
+        <arg name="fy" value="387.229248046875"/>
+        <!-- maximum velocity, acceleration and jerk the drone will reach -->
+        <arg name="max_vel" value="$(arg max_vel)"/>
+        <arg name="max_acc" value="$(arg max_acc)"/>
+        <arg name="max_jer" value="$(arg max_jer)"/>
+        <arg name="enable_angular_constraints" value="$(arg enable_angular_constraints)"/>
+        <arg name="max_angular_vel" value="$(arg max_angular_vel)"/>
+        <arg name="max_angular_acc" value="$(arg max_angular_acc)"/>
+        <arg name="auto_start_delay_sec" value="$(arg auto_start_delay_sec)"/>
+        <arg name="constraint_points_perPiece" value="$(arg constraint_points_perPiece)"/>
+        <arg name="rdp_eps" value="$(arg rdp_eps)"/>
+        <!--always set to 1.5 times grater than sensing horizen-->
+        <arg name="planning_horizon" value="7.5"/>
+        <arg name="use_multitopology_trajs" value="false"/>
+        <!-- 1: use 2D Nav Goal to select goal  -->
+        <!-- 2: use global waypoints below  -->
+        <arg name="flight_type" value="$(arg flight_type)"/>
+        <!-- global waypoints -->
+        <!-- It generates a piecewise min-snap traj passing all waypoints -->
+        <arg name="point_num" value="$(arg point_num)"/>
+        <arg name="point0_x" value="$(arg target0_x)"/>
+        <arg name="point0_y" value="$(arg target0_y)"/>
+        <arg name="point0_z" value="$(arg target0_z)"/>
+        <arg name="point1_x" value="$(arg target1_x)"/>
+        <arg name="point1_y" value="$(arg target1_y)"/>
+        <arg name="point1_z" value="$(arg target1_z)"/>
+        <arg name="point2_x" value="$(arg target2_x)"/>
+        <arg name="point2_y" value="$(arg target2_y)"/>
+        <arg name="point2_z" value="$(arg target2_z)"/>
+        <arg name="point3_x" value="$(arg target3_x)"/>
+        <arg name="point3_y" value="$(arg target3_y)"/>
+        <arg name="point3_z" value="$(arg target3_z)"/>
+        <arg name="point4_x" value="$(arg target4_x)"/>
+        <arg name="point4_y" value="$(arg target4_y)"/>
+        <arg name="point4_z" value="$(arg target4_z)"/>
+    </include>
+    <!-- trajectory server -->
+    <node pkg="ego_planner" name="drone_$(arg drone_id)_traj_server" type="traj_server" output="screen">
+        <remap from="position_cmd" to="drone_$(arg drone_id)_planning/pos_cmd"/>
+        <remap from="~planning/trajectory" to="drone_$(arg drone_id)_planning/trajectory"/>
+        <param name="traj_server/time_forward" value="1.0" type="double"/>
+        <param name="traj_server/drone_type" value="$(arg drone_type)" type="int"/>
+        <param name="traj_server/cmd_vel_thresh" value="$(arg cmd_vel_thresh)" type="double"/>
+        <param name="traj_server/init_x" value="$(arg init_x)" type="double"/>
+        <param name="traj_server/init_y" value="$(arg init_y)" type="double"/>
+        <param name="traj_server/init_z" value="$(arg init_z)" type="double"/>
+        <param name="traj_server/diffdrive_use_mpc" value="$(arg diffdrive_use_mpc)" type="int"/>
+    </node>
+    <!-- use simulator -->
+    <include file="$(find node_launcher)/launch/include/habitat_sim.xml">
+        <arg name="drone_id" value="$(arg drone_id)"/>
+        <arg name="init_x_" value="$(arg init_x)"/>
+        <arg name="init_y_" value="$(arg init_y)"/>
+        <arg name="init_z_" value="$(arg init_z)"/>
+        <arg name="odometry_topic" value="$(arg odom_topic)"/>
+
+        <arg name="gpu_device_id" value="$(arg gpu_device_id)"/>
+        <arg name="scene_id" value="$(arg scene_id)"/>
+        <arg name="scene_dataset_config_file" value="$(arg scene_dataset_config_file)"/>
+
+        <arg name="drone_type" value="$(arg drone_type)"/>
+        <arg name="agent_type" value="$(arg agent_type)"/>
+        <arg name="agent_height" value="$(arg agent_height)"/>
+        <arg name="agent_radius" value="$(arg agent_radius)"/>
+        <arg name="terrestrial_operating_height" value="$(arg terrestrial_operating_height)"/>
+        <arg name="crop_point_cloud_offset_gnd" value="$(arg crop_point_cloud_offset_gnd)"/>
+        <arg name="crop_point_cloud_offset_top" value="$(arg crop_point_cloud_offset_top)"/>
+        <arg name="frame_id_mesh" value="$(arg frame_id_mesh)"/>
+        <arg name="depth_img_trunc_meter" value="$(arg depth_img_trunc_meter)"/>
+
+        <arg name="fps" value="$(arg fps)"/>
+        <arg name="image_height" value="$(arg image_height)"/>
+        <arg name="image_width" value="$(arg image_width)"/>
+        <arg name="image_hfov" value="$(arg image_hfov)"/>
+        <arg name="camera_position_x" value="$(arg camera_position_x)"/>
+        <arg name="camera_position_y" value="$(arg camera_position_y)"/>
+        <arg name="camera_position_z" value="$(arg camera_position_z)"/>
+        <arg name="camera_orientation_x" value="$(arg camera_orientation_x)"/>
+        <arg name="camera_orientation_y" value="$(arg camera_orientation_y)"/>
+        <arg name="camera_orientation_z" value="$(arg camera_orientation_z)"/>
+
+        <arg name="color_image_raw_topic" value="$(arg color_image_raw_topic)"/>
+        <arg name="depth_image_raw_topic" value="$(arg depth_image_raw_topic)"/>
+        <arg name="local_pcd_topic" value="$(arg local_pcd_topic)"/>
+        <arg name="local_pcd_aux_topic" value="$(arg local_pcd_aux_topic)"/>
+
+    </include>
+    <include file="$(find simulator)/launch/manual_take_over/take_over_drone.launch">
+        <arg name="drone_id" value="$(arg drone_id)"/>
+        <arg name="cmd_topic" value="drone_$(arg drone_id)_planning/pos_cmd"/>
+    </include>
+</launch>

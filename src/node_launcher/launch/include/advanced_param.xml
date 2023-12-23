@@ -33,25 +33,49 @@
     <arg name="flight_type"/>
     <arg name="use_multitopology_trajs"/>
     <arg name="drone_id"/>
+
+    <!-- range z: different meaning between grid_map.cpp and grid_map_bigmap.cpp -->
+    <arg name="local_map_update_range_x"/>
+    <arg name="local_map_update_range_y"/>
+    <arg name="local_map_update_range_z"/>
+    <!-- fading_time = -1: do not fade away -->
+    <arg name="map_fading_time"/>
+
+    <!-- drone_type defaults to 0: copter, 1: omni-drive, 2: diff-drive -->
+    <!-- angular vel and acc limits only apply to drone type 2: diff-drive if enabled -->
+    <arg name="enable_angular_constraints"/>
+    <arg name="max_angular_vel"/>
+    <arg name="max_angular_acc"/>
+
+    <arg name="drone_type"/>
+    <arg name="body_height"/>
+    <arg name="body_radius"/>
+
+    <arg name="auto_start_delay_sec"/>
+    <arg name="constraint_points_perPiece"/>
+    <arg name="rdp_eps"/>
+
     <!-- main node -->
     <!-- <node pkg="ego_planner" name="ego_planner_node" type="ego_planner_node" output="screen" launch-prefix="valgrind"> -->
     <node pkg="ego_planner" name="drone_$(arg drone_id)_ego_planner_node" type="ego_planner_node" output="screen">
         <remap from="~odom_world" to="/drone_$(arg drone_id)_$(arg odometry_topic)"/>
         <remap from="~mandatory_stop" to="/mandatory_stop_to_planner"/>
-        <remap from="~planning/trajectory" to = "/drone_$(arg drone_id)_planning/trajectory"/>
-        <remap from="~planning/data_display" to = "/drone_$(arg drone_id)_planning/data_display"/>
-        <remap from="~planning/broadcast_traj_send" to = "/broadcast_traj_from_planner"/>
-        <remap from="~planning/broadcast_traj_recv" to = "/broadcast_traj_to_planner"/>
-        <remap from="~planning/heartbeat" to = "/drone_$(arg drone_id)_traj_server/heartbeat"/>
-        <remap from="/goal" to = "/goal_with_id"/>
+        <remap from="~planning/trajectory" to="/drone_$(arg drone_id)_planning/trajectory"/>
+        <remap from="~planning/data_display" to="/drone_$(arg drone_id)_planning/data_display"/>
+        <remap from="~planning/broadcast_traj_send" to="/broadcast_traj_from_planner"/>
+        <remap from="~planning/broadcast_traj_recv" to="/broadcast_traj_to_planner"/>
+        <remap from="~planning/heartbeat" to="/drone_$(arg drone_id)_traj_server/heartbeat"/>
+        <remap from="/goal" to="/goal_with_id"/>
         <remap from="~grid_map/odom" to="/drone_$(arg drone_id)_$(arg odometry_topic)"/>
         <remap from="~grid_map/cloud" to="/drone_$(arg drone_id)_$(arg cloud_topic)"/>
-        <remap from="~grid_map/pose"   to = "/drone_$(arg drone_id)_$(arg camera_pose_topic)"/>
-        <remap from="~grid_map/depth" to = "/drone_$(arg drone_id)_$(arg depth_topic)"/>
+        <remap from="~grid_map/pose" to="/drone_$(arg drone_id)_$(arg camera_pose_topic)"/>
+        <remap from="~grid_map/depth" to="/drone_$(arg drone_id)_$(arg depth_topic)"/>
         <!-- planning fsm -->
         <param name="fsm/flight_type" value="$(arg flight_type)" type="int"/>
         <param name="fsm/thresh_replan_time" value="1.0" type="double"/>
         <param name="fsm/planning_horizon" value="$(arg planning_horizon)" type="double"/>
+        <param name="fsm/auto_start_delay_sec" value="$(arg auto_start_delay_sec)" type="double"/>
+        <param name="fsm/rdp_eps" value="$(arg rdp_eps)" type="double"/>
         <!--always set to 1.5 times grater than sensing horizen-->
         <param name="fsm/emergency_time" value="1.0" type="double"/>
         <param name="fsm/realworld_experiment" value="false"/>
@@ -72,14 +96,14 @@
         <param name="fsm/waypoint4_x" value="$(arg point4_x)" type="double"/>
         <param name="fsm/waypoint4_y" value="$(arg point4_y)" type="double"/>
         <param name="fsm/waypoint4_z" value="$(arg point4_z)" type="double"/>
-        <param name="grid_map/resolution" value="0.1" />
-        <param name="grid_map/map_size_x" value="$(arg map_size_x_)" />
-        <param name="grid_map/map_size_y" value="$(arg map_size_y_)" />
-        <param name="grid_map/map_size_z" value="$(arg map_size_z_)" />
-        <param name="grid_map/local_update_range_x" value="5.5" />
-        <param name="grid_map/local_update_range_y" value="5.5" />
-        <param name="grid_map/local_update_range_z" value="2.0" /> <!-- different meaning between grid_map.cpp and grid_map_bigmap.cpp -->
-        <param name="grid_map/obstacles_inflation" value="0.1" />
+        <param name="grid_map/resolution" value="0.1"/>
+        <param name="grid_map/map_size_x" value="$(arg map_size_x_)"/>
+        <param name="grid_map/map_size_y" value="$(arg map_size_y_)"/>
+        <param name="grid_map/map_size_z" value="$(arg map_size_z_)"/>
+        <param name="grid_map/local_update_range_x" value="$(arg local_map_update_range_x)"/>
+        <param name="grid_map/local_update_range_y" value="$(arg local_map_update_range_y)"/>
+        <param name="grid_map/local_update_range_z" value="$(arg local_map_update_range_z)"/>
+        <param name="grid_map/obstacles_inflation" value="0.1"/>
         <param name="grid_map/local_map_margin" value="10"/>
         <param name="grid_map/enable_virtual_wall" value="true"/>
         <param name="grid_map/virtual_ceil" value="3.0"/>
@@ -104,7 +128,7 @@
         <param name="grid_map/p_min" value="0.12"/>
         <param name="grid_map/p_max" value="0.90"/>
         <param name="grid_map/p_occ" value="0.80"/>
-        <param name="grid_map/fading_time" value="1000.0"/>
+        <param name="grid_map/fading_time" value="$(arg map_fading_time)"/>
         <param name="grid_map/min_ray_length" value="0.1"/>
         <param name="grid_map/max_ray_length" value="4.5"/>
         <param name="grid_map/visualization_truncate_height" value="1.9"/>
@@ -119,20 +143,30 @@
         <param name="manager/planning_horizon" value="$(arg planning_horizon)" type="double"/>
         <param name="manager/use_multitopology_trajs" value="$(arg use_multitopology_trajs)" type="bool"/>
         <param name="manager/drone_id" value="$(arg drone_id)"/>
+        <param name="manager/drone_type" value="$(arg drone_type)" type="int"/>
+        <param name="manager/body_height" value="$(arg body_height)" type="double"/>
+        <param name="manager/body_radius" value="$(arg body_radius)" type="double"/>
         <!-- trajectory optimization -->
-        <param name="optimization/constraint_points_perPiece" value="5" type="int"/>
+        <param name="optimization/constraint_points_perPiece" value="$(arg constraint_points_perPiece)" type="int"/>
         <param name="optimization/weight_obstacle" value="10000.0" type="double"/>
         <param name="optimization/weight_obstacle_soft" value="5000.0" type="double"/>
         <param name="optimization/weight_swarm" value="10000.0" type="double"/>
         <param name="optimization/weight_feasibility" value="10000.0" type="double"/>
         <param name="optimization/weight_sqrvariance" value="10000.0" type="double"/>
         <param name="optimization/weight_time" value="10.0" type="double"/>
-        <param name="optimization/obstacle_clearance" value="0.1" type="double"/>
+        <param name="optimization/obstacle_clearance" value="$(arg body_radius)" type="double"/>
         <param name="optimization/obstacle_clearance_soft" value="0.5" type="double"/>
-        <param name="optimization/swarm_clearance" value="0.15000000000000002" type="double"/> <!-- heterogeneous support: my required clearance -->
+        <!-- heterogeneous support: required clearance -->
+        <param name="optimization/swarm_clearance" value="0.1" type="double"/>
         <param name="optimization/max_vel" value="$(arg max_vel)" type="double"/>
         <param name="optimization/max_acc" value="$(arg max_acc)" type="double"/>
         <param name="optimization/max_jer" value="$(arg max_jer)" type="double"/>
+        <param name="optimization/enable_angular_constraints" value="$(arg enable_angular_constraints)" type="int"/>
+        <param name="optimization/max_angular_vel" value="$(arg max_angular_vel)" type="double"/>
+        <param name="optimization/max_angular_acc" value="$(arg max_angular_acc)" type="double"/>
         <param name="optimization/record_opt" value="true"/>
+        <param name="optimization/drone_type" value="$(arg drone_type)" type="int"/>
+        <param name="optimization/body_height" value="$(arg body_height)" type="double"/>
+        <param name="optimization/body_radius" value="$(arg body_radius)" type="double"/>
     </node>
 </launch>

@@ -1,0 +1,246 @@
+<launch>
+    <arg name="map_size_x" value="50.0"/>
+    <arg name="map_size_y" value="50.0"/>
+    <arg name="map_size_z" value=" 3.0"/>
+    <arg name="odom_topic" value="visual_slam/odom"/>
+
+    <node name="rviz" pkg="rviz" type="rviz"
+          args="-d $(find node_launcher)/config/default.rviz"
+    />
+
+    <!-- swarm topic transmitter bridge-->
+    <include file="$(find ego_planner)/launch/bridge_udp.launch">
+        <arg name="drone_id" value="999"/>
+        <arg name="broadcast_ip" value="127.0.0.255"/>
+    </include>
+
+    <!-- A-G head-to-head -->
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="0"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="-2.0"/>
+        <arg name="target0_x" value="2.0"/>
+
+        <arg name="init_y" value="0.0"/>
+        <arg name="target0_y" value="0.0"/>
+
+        <arg name="init_z" value="1.2"/>
+        <arg name="target0_z" value="1.2"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="2"/>
+    </include>
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="1"/>
+        <arg name="drone_type" value="1"/>
+
+        <arg name="init_x" value="2.0"/>
+        <arg name="target0_x" value="-2.0"/>
+
+        <arg name="init_y" value="0.0"/>
+        <arg name="target0_y" value="0.0"/>
+
+        <arg name="init_z" value="0"/>
+        <arg name="target0_z" value="0"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="2"/>
+    </include>
+
+    <!-- A-A head-to-head same height-->
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="2"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="-2.0"/>
+        <arg name="target0_x" value="2.0"/>
+
+        <arg name="init_y" value="-2.0"/>
+        <arg name="target0_y" value="-2.0"/>
+
+        <arg name="init_z" value="1.5"/>
+        <arg name="target0_z" value="1.5"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="2"/>
+    </include>
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="3"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="2.0"/>
+        <arg name="target0_x" value="-2.0"/>
+
+        <arg name="init_y" value="-2.0"/>
+        <arg name="target0_y" value="-2.0"/>
+
+        <arg name="init_z" value="1.5"/>
+        <arg name="target0_z" value="1.5"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="2"/>
+    </include>
+
+    <!-- A-A head-to-head diff height-->
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="4"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="-2.0"/>
+        <arg name="target0_x" value="2.0"/>
+
+        <arg name="init_y" value="-4.0"/>
+        <arg name="target0_y" value="-4.0"/>
+
+        <arg name="init_z" value="1.5"/>
+        <arg name="target0_z" value="1.0"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="2"/>
+    </include>
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="5"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="2.0"/>
+        <arg name="target0_x" value="-2.0"/>
+
+        <arg name="init_y" value="-4.0"/>
+        <arg name="target0_y" value="-4.0"/>
+
+        <arg name="init_z" value="1.0"/>
+        <arg name="target0_z" value="1.5"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="2"/>
+    </include>
+
+    <!-- A-A chase -->
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="6"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="-2.6"/>
+        <arg name="target0_x" value="2.6"/>
+
+        <arg name="init_y" value="-6.0"/>
+        <arg name="target0_y" value="-6.0"/>
+
+        <arg name="init_z" value="1.5"/>
+        <arg name="target0_z" value="1.5"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="4"/>
+    </include>
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="7"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="-2.0"/>
+        <arg name="target0_x" value="2.0"/>
+
+        <arg name="init_y" value="-6.0"/>
+        <arg name="target0_y" value="-6.0"/>
+
+        <arg name="init_z" value="1.5"/>
+        <arg name="target0_z" value="1.5"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="1"/>
+    </include>
+
+    <!-- A-G Chase -->
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="8"/>
+        <arg name="drone_type" value="0"/>
+
+        <arg name="init_x" value="-2.6"/>
+        <arg name="target0_x" value="2.6"/>
+
+        <arg name="init_y" value="-8.0"/>
+        <arg name="target0_y" value="-8.0"/>
+
+        <arg name="init_z" value="1.0"/>
+        <arg name="target0_z" value="1.0"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="4"/>
+    </include>
+    <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_topic" value="$(arg odom_topic)"/>
+
+        <arg name="drone_id" value="9"/>
+        <arg name="drone_type" value="1"/>
+
+        <arg name="init_x" value="-2.0"/>
+        <arg name="target0_x" value="2.0"/>
+
+        <arg name="init_y" value="-8.0"/>
+        <arg name="target0_y" value="-8.0"/>
+
+        <arg name="init_z" value="0"/>
+        <arg name="target0_z" value="0"/>
+
+        <arg name="agent_radius" value="0.25"/>
+        <arg name="agent_height" value="1.5"/>
+        <arg name="max_vel" value="1"/>
+    </include>
+</launch>

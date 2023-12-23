@@ -32,7 +32,7 @@ namespace ego_planner {
         variable_num_ = 4 * (piece_num_ - 1) + 1;
         double x_init[variable_num_];
         memcpy(x_init, initInnerPts.data(), initInnerPts.size() * sizeof(x_init[0]));
-        Eigen::Map <Eigen::VectorXd> Vt(x_init + initInnerPts.size(), initT.size());
+        Eigen::Map<Eigen::VectorXd> Vt(x_init + initInnerPts.size(), initT.size());
         RealT2VirtualT(initT, Vt);
         min_ellip_dist2_.resize(swarm_trajs_->size());
 
@@ -78,10 +78,10 @@ namespace ego_planner {
                 flag_force_return = false;
 
                 /* double check: fine collision check */
-                std::vector <std::pair<int, int>> segments_nouse;
+                std::vector<std::pair<int, int>> segments_nouse;
                 for (size_t i = 0; i < swarm_trajs_->size(); ++i) {
                     flag_swarm_too_close |=
-                            min_ellip_dist2_[i] < pow((swarm_clearance_ + swarm_trajs_->at(i).des_clearance) * 1.25, 2);
+                            min_ellip_dist2_[i] < pow(body_radius_ + swarm_trajs_->at(i).body_radius, 2);
                 }
                 if (!flag_swarm_too_close) {
                     if (finelyCheckAndSetConstraintPoints(segments_nouse, jerkOpt_, false) == CHK_RET::OBS_FREE) {
@@ -185,7 +185,7 @@ namespace ego_planner {
 
     /* check collision and set {p,v} pairs to constrain points */
     PolyTrajOptimizer::CHK_RET PolyTrajOptimizer::finelyCheckAndSetConstraintPoints(
-            std::vector <std::pair<int, int>> &segments,
+            std::vector<std::pair<int, int>> &segments,
             const poly_traj::MinJerkOpt &pt_data,
             const bool flag_first_init /*= true*/) {
 
@@ -198,7 +198,7 @@ namespace ego_planner {
         }
 
         /*** Segment the initial trajectory according to obstacles ***/
-        vector <std::pair<int, int>> segment_ids;
+        vector<std::pair<int, int>> segment_ids;
         constexpr int ENOUGH_INTERVAL = 2;
         int in_id = -1, out_id = -1;
         int same_occ_state_times = ENOUGH_INTERVAL + 1;
@@ -255,11 +255,11 @@ namespace ego_planner {
         }
 
         /*** a star search ***/
-        vector <vector<Eigen::Vector3d>> a_star_pathes;
+        vector<vector<Eigen::Vector3d>> a_star_pathes;
         for (size_t i = 0; i < segment_ids.size(); ++i) {
             // Search from back to head
             Eigen::Vector3d in(init_points.col(segment_ids[i].second)), out(init_points.col(segment_ids[i].first));
-            ASTAR_RET ret = a_star_->AstarSearch(grid_map_->getResolution(), in, out);
+            ASTAR_RET ret = a_star_->AstarSearch(grid_map_->getResolution(), in, out, drone_type_ != 0);
             if (ret == ASTAR_RET::SUCCESS) {
                 a_star_pathes.push_back(a_star_->getPath());
             } else if (ret == ASTAR_RET::SEARCH_ERR && i + 1 < segment_ids.size()) // connect the next segment
@@ -267,7 +267,7 @@ namespace ego_planner {
                 segment_ids[i].second = segment_ids[i + 1].second;
                 segment_ids.erase(segment_ids.begin() + i + 1);
                 --i;
-                ROS_WARN("A corner case 2, I have never exeam it.");
+                ROS_WARN("A-star search error, try to connect the next segment to avoid fenced free space.");
             } else {
                 ROS_WARN_COND(VERBOSE_OUTPUT, "A-star error, force return!");
                 return CHK_RET::ERR;
@@ -276,7 +276,7 @@ namespace ego_planner {
 
         /*** calculate bounds ***/
         int id_low_bound, id_up_bound;
-        vector <std::pair<int, int>> bounds(segment_ids.size());
+        vector<std::pair<int, int>> bounds(segment_ids.size());
         for (size_t i = 0; i < segment_ids.size(); i++) {
 
             if (i == 0) // first segment
@@ -304,7 +304,7 @@ namespace ego_planner {
         }
 
         /*** Adjust segment length ***/
-        vector <std::pair<int, int>> adjusted_segment_ids(segment_ids.size());
+        vector<std::pair<int, int>> adjusted_segment_ids(segment_ids.size());
         constexpr double MINIMUM_PERCENT = 0.0; // Each segment is guaranteed to have sufficient points to generate sufficient force
         int minimum_points = round(init_points.cols() * MINIMUM_PERCENT), num_points;
         for (size_t i = 0; i < segment_ids.size(); i++) {
@@ -336,7 +336,7 @@ namespace ego_planner {
         }
 
         // Used for return
-        vector <std::pair<int, int>> final_segment_ids;
+        vector<std::pair<int, int>> final_segment_ids;
 
         /*** Assign data to each segment ***/
         for (size_t i = 0; i < segment_ids.size(); i++) {
@@ -489,7 +489,7 @@ namespace ego_planner {
 
         /*** Check and segment the initial trajectory according to obstacles ***/
         int in_id, out_id;
-        vector <std::pair<int, int>> segment_ids;
+        vector<std::pair<int, int>> segment_ids;
         bool flag_new_obs_valid = false;
         int i_end = ConstraintPoints::two_thirds_id(cps_.points, touch_goal_); // only check closed 2/3 points.
         for (int i = 1; i <= i_end; ++i) {
@@ -548,11 +548,12 @@ namespace ego_planner {
         }
 
         if (flag_new_obs_valid) {
-            vector <vector<Eigen::Vector3d>> a_star_pathes;
+            vector<vector<Eigen::Vector3d>> a_star_pathes;
             for (size_t i = 0; i < segment_ids.size(); ++i) {
                 /*** a star search ***/
                 Eigen::Vector3d in(cps_.points.col(segment_ids[i].second)), out(cps_.points.col(segment_ids[i].first));
-                ASTAR_RET ret = a_star_->AstarSearch(/*(in-out).norm()/10+0.05*/ grid_map_->getResolution(), in, out);
+                ASTAR_RET ret = a_star_->AstarSearch(/*(in-out).norm()/10+0.05*/ grid_map_->getResolution(), in, out,
+                                                                                 drone_type_ != 0);
                 if (ret == ASTAR_RET::SUCCESS) {
                     a_star_pathes.push_back(a_star_->getPath());
                 } else if (ret == ASTAR_RET::SEARCH_ERR && i + 1 < segment_ids.size()) // connect the next segment
@@ -560,7 +561,7 @@ namespace ego_planner {
                     segment_ids[i].second = segment_ids[i + 1].second;
                     segment_ids.erase(segment_ids.begin() + i + 1);
                     --i;
-                    ROS_WARN("A corner case 2, I have never exeam it.");
+                    ROS_WARN("A-star search error, try to connect the next segment to avoid fenced free space.");
                 } else {
                     ROS_ERROR_COND(VERBOSE_OUTPUT, "A-star error");
                     segment_ids.erase(segment_ids.begin() + i);
@@ -717,10 +718,10 @@ namespace ego_planner {
     }
 
     /* multi-topo support */
-    std::vector <ConstraintPoints> PolyTrajOptimizer::distinctiveTrajs(vector <std::pair<int, int>> segments) {
+    std::vector<ConstraintPoints> PolyTrajOptimizer::distinctiveTrajs(vector<std::pair<int, int>> segments) {
         if (segments.size() == 0) // will be invoked again later.
         {
-            std::vector <ConstraintPoints> oneSeg;
+            std::vector<ConstraintPoints> oneSeg;
             oneSeg.push_back(cps_);
             return oneSeg;
         }
@@ -728,16 +729,16 @@ namespace ego_planner {
         constexpr int MAX_TRAJS = 8;
         constexpr int VARIS = 2;
         int seg_upbound = std::min((int) segments.size(), static_cast<int>(floor(log(MAX_TRAJS) / log(VARIS))));
-        std::vector <ConstraintPoints> control_pts_buf;
+        std::vector<ConstraintPoints> control_pts_buf;
         control_pts_buf.reserve(MAX_TRAJS);
         const double RESOLUTION = grid_map_->getResolution();
         const double CTRL_PT_DIST =
                 (cps_.points.col(0) - cps_.points.col(cps_.cp_size - 1)).norm() / (cps_.cp_size - 1);
 
         // Step 1. Find the opposite vectors and base points for every segment.
-        std::vector <std::pair<ConstraintPoints, ConstraintPoints>> RichInfoSegs;
+        std::vector<std::pair<ConstraintPoints, ConstraintPoints>> RichInfoSegs;
         for (int i = 0; i < seg_upbound; i++) {
-            std::pair <ConstraintPoints, ConstraintPoints> RichInfoOneSeg;
+            std::pair<ConstraintPoints, ConstraintPoints> RichInfoOneSeg;
             ConstraintPoints RichInfoOneSeg_temp;
             cps_.segment(RichInfoOneSeg_temp, segments[i].first, segments[i].second);
             RichInfoOneSeg.first = RichInfoOneSeg_temp;
@@ -814,7 +815,7 @@ namespace ego_planner {
                             }
                         }
 
-                        std::vector <ConstraintPoints> blank;
+                        std::vector<ConstraintPoints> blank;
                         return blank;
                     }
 
@@ -940,7 +941,7 @@ namespace ego_planner {
         // Step 2. Assemble each segment to make up the new control point sequence.
         if (seg_upbound == 0) // After the erase operation above, segment legth will decrease to 0 again.
         {
-            std::vector <ConstraintPoints> oneSeg;
+            std::vector<ConstraintPoints> oneSeg;
             oneSeg.push_back(cps_);
             return oneSeg;
         }
@@ -1022,8 +1023,8 @@ namespace ego_planner {
         Eigen::Map<const Eigen::MatrixXd> P(x, 3, opt->piece_num_ - 1);
         // Eigen::VectorXd T(Eigen::VectorXd::Constant(piece_nums, opt->t2T(x[n - 1]))); // same t
         Eigen::Map<const Eigen::VectorXd> t(x + (3 * (opt->piece_num_ - 1)), opt->piece_num_);
-        Eigen::Map <Eigen::MatrixXd> gradP(grad, 3, opt->piece_num_ - 1);
-        Eigen::Map <Eigen::VectorXd> gradt(grad + (3 * (opt->piece_num_ - 1)), opt->piece_num_);
+        Eigen::Map<Eigen::MatrixXd> gradP(grad, 3, opt->piece_num_ - 1);
+        Eigen::Map<Eigen::VectorXd> gradt(grad + (3 * (opt->piece_num_ - 1)), opt->piece_num_);
         Eigen::VectorXd T(opt->piece_num_);
 
         Eigen::VectorXd gradT(opt->piece_num_);
@@ -1114,6 +1115,13 @@ namespace ego_planner {
         Eigen::Matrix<double, 6, 3> gradViolaPc, gradViolaVc, gradViolaAc, gradViolaJc;
         double gradViolaPt, gradViolaVt, gradViolaAt, gradViolaJt;
         double omg;
+
+        double ang_vel, ang_acc, ang_jer;
+        double grad_ang_vel_positive, grad_ang_vel_negative, grad_ang_acc_positive, grad_ang_acc_negative;
+        double cost_ang_vel_positive, cost_ang_vel_negative, cost_ang_acc_positive, cost_ang_acc_negative;
+        double gradViola_ang_vel_positive_t, gradViola_ang_vel_negative_t, gradViola_ang_acc_positive_t, gradViola_ang_acc_negative_t;
+        Eigen::Matrix<double, 6, 3> gradViola_ang_vel_positive_c, gradViola_ang_vel_negative_c, gradViola_ang_acc_positive_c, gradViola_ang_acc_negative_c;
+
         int i_dp = 0;
         costs.setZero();
         // Eigen::MatrixXd constraint_pts(3, N * K + 1);
@@ -1145,6 +1153,35 @@ namespace ego_planner {
                 acc = c.transpose() * beta2;
                 jer = c.transpose() * beta3;
                 sna = c.transpose() * beta4;
+                double vel_sqn = vel.squaredNorm();
+                if (vel_sqn == 0) {
+                    // singularity, set the values to zero
+                    ang_vel = 0;
+                    ang_acc = 0;
+                    ang_jer = 0;
+                } else {
+                    // angular velocity https://www.wolframalpha.com/input?i=d%2Fdt+atan2%28y%28t%29%2C+x%28t%29%29
+                    ang_vel = (vel(0) * acc(1) - vel(1) * acc(0)) / vel_sqn;
+
+                    // angular acceleration https://www.wolframalpha.com/input?i=d%2Fdt+d%2Fdt+atan2%28y%28t%29%2C+x%28t%29%29
+                    auto temp0 = vel(0) * jer(1) - vel(1) * jer(0);
+                    auto temp1 = 2 * ang_vel * (vel(0) * acc(1) + vel(1) * acc(0));
+                    ang_acc = (temp0 - temp1) / vel_sqn;
+
+                    // angular jerk https://www.wolframalpha.com/input?i=d%2Fdt+d%2Fdt+d%2Fdt+atan2%28y%28t%29%2C+x%28t%29%29
+                    auto temp2 = vel(0) * jer(0) + acc(0) * acc(0) + vel(1) * jer(1) + acc(1) * acc(1);
+                    auto temp3 = -2 * ang_vel * temp2 / vel_sqn;
+
+                    auto temp4 = -sna(0) * vel(1) - jer(0) * acc(1) + acc(0) * jer(1) + vel(0) * sna(1);
+                    auto temp5 = temp4 / vel_sqn;
+
+                    auto temp6 = (vel(0) * acc(0) + vel(1) * acc(1)) * (vel(0) * jer(1) - vel(1) * jer(0));
+                    auto temp7 = 4 * temp6 / (vel_sqn * vel_sqn);
+
+                    auto temp8 = 2 * (vel(1) * acc(0) - vel(0) * acc(1)) * (vel(0) * acc(0) + vel(1) * acc(1));
+
+                    ang_jer = temp3 + temp5 - temp7 + temp8;
+                }
 
                 omg = (j == 0 || j == K) ? 0.5 : 1.0;
 
@@ -1195,6 +1232,139 @@ namespace ego_planner {
                     jerkOpt_.get_gdC().block<6, 3>(i * 6, 0) += omg * step * gradViolaJc;
                     gdT(i) += omg * (costj / K + step * gradViolaJt);
                     costs(2) += omg * step * costj;
+                }
+
+                // diff-drive type robot: limit angular vel and acc
+                if (drone_type_ == 2 && vel_sqn >= 0.1 && enable_angular_constraint_ == 1) {
+                    if (feasibilityGradCostAngVelPositive(ang_vel, grad_ang_vel_positive, cost_ang_vel_positive)) {
+                        // grad to coefficient matrix
+                        Eigen::Matrix<double, 6, 3> d_ang_vel_to_c;
+                        Eigen::Matrix3d z;
+                        z << 0, -1, 0, 1, 0, 0, 0, 0, 0;
+
+                        auto tmp0 = beta2 * beta1.transpose() * c * z.transpose();
+                        auto tmp1 = beta1 * beta2.transpose() * c * z.transpose();
+                        auto term0 = (tmp0 + tmp1) / vel_sqn;
+
+                        auto tmp2 = beta1.transpose() * c * z.transpose() * c.transpose() * beta2;
+                        auto tmp3 = beta2.transpose() * c * z * c.transpose() * beta1;
+                        auto tmp4 = beta1 * beta1.transpose() * c;
+                        auto term1 = (tmp2 * tmp4 + tmp3 * tmp4) / (vel_sqn * vel_sqn);
+
+                        d_ang_vel_to_c = term0 - term1;
+
+                        gradViola_ang_vel_positive_c = d_ang_vel_to_c * grad_ang_vel_positive;
+                        jerkOpt_.get_gdC().block<6, 3>(i * 6, 0) += omg * step * gradViola_ang_vel_positive_c;
+
+                        // grad to time t
+                        gradViola_ang_vel_positive_t = alpha * grad_ang_vel_positive * ang_acc;
+                        gdT(i) += omg * (costj / K + step * gradViola_ang_vel_positive_t);
+
+                        // add cost
+                        costs(2) += omg * step * cost_ang_vel_positive;
+                    }
+
+                    if (feasibilityGradCostAngVelNegative(ang_vel, grad_ang_vel_negative, cost_ang_vel_negative)) {
+                        // grad to coefficient matrix
+                        Eigen::Matrix<double, 6, 3> d_ang_vel_to_c;
+                        Eigen::Matrix3d z;
+                        z << 0, -1, 0, 1, 0, 0, 0, 0, 0;
+
+                        auto tmp0 = beta2 * beta1.transpose() * c * z.transpose();
+                        auto tmp1 = beta1 * beta2.transpose() * c * z.transpose();
+                        auto term0 = (tmp0 + tmp1) / vel_sqn;
+
+                        auto tmp2 = beta1.transpose() * c * z.transpose() * c.transpose() * beta2;
+                        auto tmp3 = beta2.transpose() * c * z * c.transpose() * beta1;
+                        auto tmp4 = beta1 * beta1.transpose() * c;
+                        auto term1 = (tmp2 * tmp4 + tmp3 * tmp4) / (vel_sqn * vel_sqn);
+
+                        d_ang_vel_to_c = term0 - term1;
+
+                        gradViola_ang_vel_negative_c = d_ang_vel_to_c * grad_ang_vel_negative;
+                        jerkOpt_.get_gdC().block<6, 3>(i * 6, 0) += omg * step * gradViola_ang_vel_negative_c;
+
+                        // grad to time t
+                        gradViola_ang_vel_negative_t = alpha * grad_ang_vel_negative * ang_acc;
+                        gdT(i) += omg * (costj / K + step * gradViola_ang_vel_negative_t);
+
+                        // add cost
+                        costs(2) += omg * step * cost_ang_vel_negative;
+                    }
+
+                    if (feasibilityGradCostAngAccPositive(ang_acc, grad_ang_acc_positive, cost_ang_acc_positive)) {
+                        // grad to coefficient matrix
+                        Eigen::Matrix<double, 6, 3> d_ang_acc_to_c;
+                        Eigen::Matrix3d z;
+                        z << 0, -1, 0, 1, 0, 0, 0, 0, 0;
+
+                        double cc12 = beta1.transpose() * c * c.transpose() * beta2;
+                        double czc12 = beta1.transpose() * c * z.transpose() * c.transpose() * beta2;
+                        double czc13 = beta1.transpose() * c * z.transpose() * c.transpose() * beta3;
+
+                        auto bbc11 = beta1 * beta1.transpose() * c;
+                        auto bbc12 = beta1 * beta2.transpose() * c;
+                        auto bbc21 = beta2 * beta1.transpose() * c;
+                        auto bbcz12 = beta1 * beta2.transpose() * c * z;
+                        auto bbcz21 = beta2 * beta1.transpose() * c * z.transpose();
+                        auto bbcz13 = beta1 * beta3.transpose() * c * z;
+                        auto bbcz31 = beta3 * beta1.transpose() * c * z.transpose();
+
+                        auto term0 = (bbcz31 + bbcz13) / vel_sqn;
+                        auto term1 = 2 * czc13 * bbc11 / (vel_sqn * vel_sqn);
+                        auto term2 = -2 * (cc12 * (bbcz12 + bbcz21) + czc12 * (bbc12 + bbc21)) / (vel_sqn * vel_sqn);
+                        auto term3 =
+                                -2 * bbc11 * 2 * (czc13 * vel_sqn - 2 * czc12 * cc12) / (vel_sqn * vel_sqn * vel_sqn);
+
+                        d_ang_acc_to_c = term0 + term1 + term2 + term3;
+
+                        gradViola_ang_acc_positive_c = d_ang_acc_to_c * grad_ang_acc_positive;
+                        jerkOpt_.get_gdC().block<6, 3>(i * 6, 0) += omg * step * gradViola_ang_acc_positive_c;
+
+                        // grad to time t
+                        gradViola_ang_acc_positive_t = alpha * grad_ang_acc_positive * ang_jer;
+                        gdT(i) += omg * (costj / K + step * gradViola_ang_acc_positive_t);
+
+                        // add cost
+                        costs(2) += omg * step * cost_ang_acc_positive;
+                    }
+
+                    if (feasibilityGradCostAngAccNegative(ang_acc, grad_ang_acc_negative, cost_ang_acc_negative)) {
+                        // grad to coefficient matrix
+                        Eigen::Matrix<double, 6, 3> d_ang_acc_to_c;
+                        Eigen::Matrix3d z;
+                        z << 0, -1, 0, 1, 0, 0, 0, 0, 0;
+
+                        double cc12 = beta1.transpose() * c * c.transpose() * beta2;
+                        double czc12 = beta1.transpose() * c * z.transpose() * c.transpose() * beta2;
+                        double czc13 = beta1.transpose() * c * z.transpose() * c.transpose() * beta3;
+
+                        auto bbc11 = beta1 * beta1.transpose() * c;
+                        auto bbc12 = beta1 * beta2.transpose() * c;
+                        auto bbc21 = beta2 * beta1.transpose() * c;
+                        auto bbcz12 = beta1 * beta2.transpose() * c * z;
+                        auto bbcz21 = beta2 * beta1.transpose() * c * z.transpose();
+                        auto bbcz13 = beta1 * beta3.transpose() * c * z;
+                        auto bbcz31 = beta3 * beta1.transpose() * c * z.transpose();
+
+                        auto term0 = (bbcz31 + bbcz13) / vel_sqn;
+                        auto term1 = 2 * czc13 * bbc11 / (vel_sqn * vel_sqn);
+                        auto term2 = -2 * (cc12 * (bbcz12 + bbcz21) + czc12 * (bbc12 + bbc21)) / (vel_sqn * vel_sqn);
+                        auto term3 =
+                                -2 * bbc11 * 2 * (czc13 * vel_sqn - 2 * czc12 * cc12) / (vel_sqn * vel_sqn * vel_sqn);
+
+                        d_ang_acc_to_c = term0 + term1 + term2 + term3;
+
+                        gradViola_ang_acc_negative_c = d_ang_acc_to_c * grad_ang_acc_negative;
+                        jerkOpt_.get_gdC().block<6, 3>(i * 6, 0) += omg * step * gradViola_ang_acc_negative_c;
+
+                        // grad to time t
+                        gradViola_ang_acc_negative_t = alpha * grad_ang_acc_negative * ang_jer;
+                        gdT(i) += omg * (costj / K + step * gradViola_ang_acc_negative_t);
+
+                        // add cost
+                        costs(2) += omg * step * cost_ang_acc_negative;
+                    }
                 }
 
                 // printf("L\n");
@@ -1303,7 +1473,8 @@ namespace ego_planner {
         grad_prev_t = 0;
         costp = 0;
 
-        constexpr double a = 2.0, b = 1.0, inv_a2 = 1 / a / a, inv_b2 = 1 / b / b;
+        constexpr double a = 2.0, b = 1.0, inv_b2 = 1 / b / b;
+        double inv_a2 = 1 / a / a;
 
         for (size_t id = 0; id < swarm_trajs_->size(); id++) {
             if ((swarm_trajs_->at(id).drone_id < 0) || swarm_trajs_->at(id).drone_id == drone_id_) {
@@ -1313,8 +1484,7 @@ namespace ego_planner {
             double traj_i_satrt_time = swarm_trajs_->at(id).start_time;
             double pt_time =
                     (t_now_ - traj_i_satrt_time) + t; // never assign a high-precision golbal time to a double directly!
-            const double CLEARANCE = (swarm_clearance_ + swarm_trajs_->at(id).des_clearance) *
-                                     1.5; // 1.5 is to compensate slight constraint violation
+            const double CLEARANCE = 1.1 * (body_radius_ + swarm_trajs_->at(id).body_radius + swarm_clearance_);
             const double CLEARANCE2 = CLEARANCE * CLEARANCE;
 
             Eigen::Vector3d swarm_p, swarm_v;
@@ -1328,6 +1498,27 @@ namespace ego_planner {
                           exceed_time * swarm_v;
             }
             Eigen::Vector3d dist_vec = p - swarm_p;
+
+            if (drone_type_ == 0 && swarm_trajs_->at(id).drone_type != 0) {
+                // if A->G
+                if (dist_vec(2) < 0 || dist_vec(2) > body_radius_ + swarm_trajs_->at(id).body_height) {
+                    // skip those on the higher floors and below the altitude threshold
+                    continue;
+                } else {
+                    // otherwise consider the aerial drone on the horizontal plane
+                    inv_a2 = 0;
+                }
+            } else if (drone_type_ != 0) {
+                // if G->A or G->G
+                if (dist_vec(2) > 0.1 || dist_vec(2) < -body_height_ - swarm_trajs_->at(id).body_radius) {
+                    // skip agents below me and those at a safe altitude
+                    continue;
+                } else {
+                    // otherwise consider horizontal distance
+                    inv_a2 = 0;
+                }
+            }
+
             double ellip_dist2 = dist_vec(2) * dist_vec(2) * inv_a2 +
                                  (dist_vec(0) * dist_vec(0) + dist_vec(1) * dist_vec(1)) * inv_b2;
             double dist2_err = CLEARANCE2 - ellip_dist2;
@@ -1386,6 +1577,54 @@ namespace ego_planner {
         if (jpen > 0) {
             gradj = wei_feas_ * 6 * jpen * jpen * j;
             costj = wei_feas_ * jpen * jpen * jpen;
+            return true;
+        }
+        return false;
+    }
+
+    bool PolyTrajOptimizer::feasibilityGradCostAngVelPositive(const double &ang_vel,
+                                                              double &grad_ang_vel,
+                                                              double &cost_ang_vel) {
+        double ang_vel_penalty = ang_vel - max_angular_vel_;
+        if (ang_vel_penalty > 0) {
+            grad_ang_vel = wei_feas_ * 3 * ang_vel_penalty * ang_vel_penalty * 1;
+            cost_ang_vel = wei_feas_ * ang_vel_penalty * ang_vel_penalty * ang_vel_penalty;
+            return true;
+        }
+        return false;
+    }
+
+    bool PolyTrajOptimizer::feasibilityGradCostAngVelNegative(const double &ang_vel,
+                                                              double &grad_ang_vel,
+                                                              double &cost_ang_vel) {
+        double ang_vel_penalty = -ang_vel - max_angular_vel_;
+        if (ang_vel_penalty > 0) {
+            grad_ang_vel = wei_feas_ * 3 * ang_vel_penalty * ang_vel_penalty * (-1);
+            cost_ang_vel = wei_feas_ * ang_vel_penalty * ang_vel_penalty * ang_vel_penalty;
+            return true;
+        }
+        return false;
+    }
+
+    bool PolyTrajOptimizer::feasibilityGradCostAngAccPositive(const double &ang_acc,
+                                                              double &grad_ang_acc,
+                                                              double &cost_ang_acc) {
+        double ang_acc_penalty = ang_acc - max_angular_acc_;
+        if (ang_acc_penalty > 0) {
+            grad_ang_acc = wei_feas_ * 3 * ang_acc_penalty * ang_acc_penalty * 1;
+            cost_ang_acc = wei_feas_ * ang_acc_penalty * ang_acc_penalty * ang_acc_penalty;
+            return true;
+        }
+        return false;
+    }
+
+    bool PolyTrajOptimizer::feasibilityGradCostAngAccNegative(const double &ang_acc,
+                                                              double &grad_ang_acc,
+                                                              double &cost_ang_acc) {
+        double ang_acc_penalty = -ang_acc - max_angular_acc_;
+        if (ang_acc_penalty > 0) {
+            grad_ang_acc = wei_feas_ * 3 * ang_acc_penalty * ang_acc_penalty * (-1);
+            cost_ang_acc = wei_feas_ * ang_acc_penalty * ang_acc_penalty * ang_acc_penalty;
             return true;
         }
         return false;
@@ -1457,13 +1696,22 @@ namespace ego_planner {
         nh.param("optimization/max_vel", max_vel_, -1.0);
         nh.param("optimization/max_acc", max_acc_, -1.0);
         nh.param("optimization/max_jer", max_jer_, -1.0);
+        nh.param("optimization/enable_angular_constraints", enable_angular_constraint_, 0);
+        nh.param("optimization/max_angular_vel", max_angular_vel_, -1.0);
+        nh.param("optimization/max_angular_acc", max_angular_acc_, -1.0);
+        nh.param("optimization/drone_type", drone_type_, 0);
+        nh.param("optimization/body_height", body_height_, 0.0);
+        nh.param("optimization/body_radius", body_radius_, 0.0);
     }
 
     void PolyTrajOptimizer::setEnvironment(const GridMap::Ptr &map) {
         grid_map_ = map;
 
         a_star_.reset(new AStar);
-        a_star_->initGridMap(grid_map_, Eigen::Vector3i(100, 100, 100));
+        if (drone_type_ == 0)
+            a_star_->initGridMap(grid_map_, Eigen::Vector3i(100, 100, 100));
+        else
+            a_star_->initGridMap(grid_map_, Eigen::Vector3i(500, 500, 3));
     }
 
     void PolyTrajOptimizer::setControlPoints(const Eigen::MatrixXd &points) {

@@ -38,7 +38,9 @@ namespace ego_planner {
         double end_time;   // world time
         Eigen::Vector3d start_pos;
         double des_clearance;
-
+        int drone_type;
+        double body_height;
+        double body_radius;
     };
 
     typedef std::vector<LocalTrajData> SwarmTrajData;
@@ -89,6 +91,9 @@ namespace ego_planner {
         bool use_multitopology_trajs;
         bool touch_goal;
         int drone_id; // single drone: drone_id <= -1, swarm: drone_id >= 0
+        int drone_type; // copter: 0, omni-drive: 1, diff-drive: 2
+        double body_height; // applies for terrestrial drones aka type == 1 || type == 2
+        double body_radius;
 
         /* processing time */
         double time_search_ = 0.0;

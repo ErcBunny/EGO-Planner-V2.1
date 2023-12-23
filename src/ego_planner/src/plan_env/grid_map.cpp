@@ -330,7 +330,7 @@ void GridMap::cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img) {
         return;
     }
 
-    pcl::PointCloud <pcl::PointXYZ> latest_cloud;
+    pcl::PointCloud<pcl::PointXYZ> latest_cloud;
     pcl::fromROSMsg(*img, latest_cloud);
 
     if (latest_cloud.points.size() == 0)
@@ -772,7 +772,7 @@ void GridMap::publishMap() {
         return;
 
     Eigen::Vector3d heading = (md_.camera_r_m_ * md_.cam2body_.block<3, 3>(0, 0).transpose()).block<3, 1>(0, 0);
-    pcl::PointCloud <pcl::PointXYZ> cloud;
+    pcl::PointCloud<pcl::PointXYZ> cloud;
     double lbz = mp_.enable_virtual_walll_ ? max(md_.ringbuffer_lowbound3d_(2), mp_.virtual_ground_)
                                            : md_.ringbuffer_lowbound3d_(2);
     double ubz = mp_.enable_virtual_walll_ ? min(md_.ringbuffer_upbound3d_(2), mp_.virtual_ceil_)
@@ -786,7 +786,7 @@ void GridMap::publishMap() {
                  yd <= md_.ringbuffer_upbound3d_(1); yd += mp_.resolution_)
                 for (double zd = lbz + mp_.resolution_ / 2; zd <= ubz; zd += mp_.resolution_) {
                     Eigen::Vector3d relative_dir = (Eigen::Vector3d(xd, yd, zd) - md_.camera_pos_);
-                    if (heading.dot(relative_dir.normalized()) > 0.5) {
+                    if (heading.dot(relative_dir.normalized()) > -1) {
                         if (md_.occupancy_buffer_[globalIdx2BufIdx(pos2GlobalIdx(Eigen::Vector3d(xd, yd, zd)))] >=
                             mp_.min_occupancy_log_)
                             cloud.push_back(pcl::PointXYZ(xd, yd, zd));
@@ -809,7 +809,7 @@ void GridMap::publishMapInflate() {
         return;
 
     Eigen::Vector3d heading = (md_.camera_r_m_ * md_.cam2body_.block<3, 3>(0, 0).transpose()).block<3, 1>(0, 0);
-    pcl::PointCloud <pcl::PointXYZ> cloud;
+    pcl::PointCloud<pcl::PointXYZ> cloud;
     double lbz = mp_.enable_virtual_walll_ ? max(md_.ringbuffer_inf_lowbound3d_(2), mp_.virtual_ground_)
                                            : md_.ringbuffer_inf_lowbound3d_(2);
     double ubz = mp_.enable_virtual_walll_ ? min(md_.ringbuffer_inf_upbound3d_(2), mp_.virtual_ceil_)
@@ -823,7 +823,7 @@ void GridMap::publishMapInflate() {
                  yd < md_.ringbuffer_inf_upbound3d_(1); yd += mp_.resolution_)
                 for (double zd = lbz + mp_.resolution_ / 2; zd < ubz; zd += mp_.resolution_) {
                     Eigen::Vector3d relative_dir = (Eigen::Vector3d(xd, yd, zd) - md_.camera_pos_);
-                    if (heading.dot(relative_dir.normalized()) > 0.5) {
+                    if (heading.dot(relative_dir.normalized()) > -1) {
                         if (md_.occupancy_buffer_inflate_[globalIdx2InfBufIdx(
                                 pos2GlobalIdx(Eigen::Vector3d(xd, yd, zd)))])
                             cloud.push_back(pcl::PointXYZ(xd, yd, zd));

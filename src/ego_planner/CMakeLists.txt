@@ -29,6 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(PCL REQUIRED) # need to find PCL before Boost to avoid ld issues
 find_package(Eigen3 REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(ompl REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -137,6 +138,11 @@ include_directories(
         ${PCL_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
+        ${OMPL_INCLUDE_DIRS}
+        $ENV{CONDA_PREFIX}/include/blasfeo/include
+        $ENV{CONDA_PREFIX}/include/hpipm/include
+        /usr/local/include/blasfeo/include
+        /usr/local/include/hpipm/include
 )
 
 ## Declare a C++ library
@@ -158,6 +164,7 @@ add_executable(drone_detect_node src/drone_detect_node.cpp src/drone_detector/dr
 add_executable(ego_planner_node
         src/ego_planner_node.cpp
         src/optimizer/poly_traj_optimizer.cpp
+        src/path_searching/ompl_search.cpp
         src/path_searching/dyn_a_star.cpp
         src/plan_env/grid_map.cpp
         src/plan_env/raycast.cpp
@@ -167,7 +174,69 @@ add_executable(ego_planner_node
 )
 add_executable(moving_obstacles src/moving_obstacles.cpp src/traj_utils/planning_visualization.cpp)
 add_executable(traj2odom_node src/traj2odom_node.cpp src/optimizer/poly_traj_optimizer.cpp src/path_searching/dyn_a_star.cpp)
-add_executable(traj_server src/traj_server.cpp src/optimizer/poly_traj_optimizer.cpp src/path_searching/dyn_a_star.cpp)
+add_executable(traj_server
+        src/traj_server.cpp
+        src/optimizer/poly_traj_optimizer.cpp
+        src/path_searching/dyn_a_star.cpp
+        include/acados_export_diffdrive/acados_solver_diffdrive.c
+        include/acados_export_diffdrive/acados_sim_solver_diffdrive.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_e_fun.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_e_fun_jac_uxt_zt.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_fun.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_fun_jac_uxt_zt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_hess.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_hess.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_hess.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_ode_fun.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_vde_adj.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_vde_forw.c
+)
+add_executable(main_diffdrive
+        include/acados_export_diffdrive/main_diffdrive.c
+        include/acados_export_diffdrive/acados_solver_diffdrive.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_e_fun.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_e_fun_jac_uxt_zt.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_fun.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_fun_jac_uxt_zt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_hess.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_hess.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_hess.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_ode_fun.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_vde_adj.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_vde_forw.c
+)
+add_executable(main_sim_diffdrive
+        include/acados_export_diffdrive/main_sim_diffdrive.c
+        include/acados_export_diffdrive/acados_sim_solver_diffdrive.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_e_fun.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_e_fun_jac_uxt_zt.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_fun.c
+        include/acados_export_diffdrive/diffdrive_constraints/diffdrive_constr_h_fun_jac_uxt_zt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_0_hess.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_e_hess.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_fun.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_fun_jac_ut_xt.c
+        include/acados_export_diffdrive/diffdrive_cost/diffdrive_cost_y_hess.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_ode_fun.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_vde_adj.c
+        include/acados_export_diffdrive/diffdrive_model/diffdrive_expl_vde_forw.c
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -185,10 +254,12 @@ add_executable(traj_server src/traj_server.cpp src/optimizer/poly_traj_optimizer
 # )
 target_link_libraries(bridge_node_udp ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(drone_detect_node ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries(ego_planner_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(ego_planner_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OMPL_LIBRARIES})
 target_link_libraries(moving_obstacles ${catkin_LIBRARIES})
 target_link_libraries(traj2odom_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(traj_server ${catkin_LIBRARIES})
+target_link_libraries(traj_server ${catkin_LIBRARIES} acados hpipm blasfeo m)
+target_link_libraries(main_diffdrive acados hpipm blasfeo m)
+target_link_libraries(main_sim_diffdrive acados hpipm blasfeo m)
 
 #############
 ## Install ##

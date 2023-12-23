@@ -7,7 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /simulation_map1/Autocompute Value Bounds1
-        - /drone01
+        - /drone01/Planning1
         - /drone01/Planning1/drone_path1
         - /drone01/Planning1/drone_path1/Offset1
         - /drone01/Mapping1
@@ -179,7 +179,7 @@ Panels:
         - /drone411/Mapping1/map inflate1
         - /MovingObstaclesJoystick01/PredictedTrajectories1
       Splitter Ratio: 0.4771505296230316
-    Tree Height: 641
+    Tree Height: 479
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -196,10 +196,9 @@ Panels:
     Name: Views
     Splitter Ratio: 0.5
   - Class: rviz/Time
-    Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: simulation_map
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -214,6 +213,7 @@ Visualization Manager:
       Name: Axes
       Radius: 0.10000000149011612
       Reference Frame: <Fixed Frame>
+      Show Trail: false
       Value: true
     - Alpha: 0.5
       Cell Size: 1
@@ -248,9 +248,7 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 4096
       Min Color: 0; 0; 0
-      Min Intensity: 0
       Name: simulation_map
       Position Transformer: XYZ
       Queue Size: 10
@@ -268,21 +266,21 @@ Visualization Manager:
         - Class: rviz/Group
           Displays:
             - Class: rviz/Marker
-              Enabled: false
+              Enabled: true
               Marker Topic: /drone_0_ego_planner_node/goal_point
               Name: goal_point
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
-              Value: false
+              Value: true
             - Class: rviz/Marker
-              Enabled: false
+              Enabled: true
               Marker Topic: /drone_0_ego_planner_node/global_list
               Name: global_path
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
-              Value: false
+              Value: true
             - Class: rviz/Marker
               Enabled: true
               Marker Topic: /drone_0_ego_planner_node/optimal_list
@@ -292,29 +290,29 @@ Visualization Manager:
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
-              Enabled: false
+              Enabled: true
               Marker Topic: /drone_0_ego_planner_node/failed_list
               Name: FailedList
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
-              Value: false
+              Value: true
             - Class: rviz/Marker
-              Enabled: false
-              Marker Topic: /ego_planner_node/a_star_list
+              Enabled: true
+              Marker Topic: /drone_0_ego_planner_node/a_star_list
               Name: AStar
               Namespaces:
                 {}
               Queue Size: 100
-              Value: false
+              Value: true
             - Class: rviz/Marker
-              Enabled: false
+              Enabled: true
               Marker Topic: /drone_0_ego_planner_node/init_list
               Name: InitTraj
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
-              Value: false
+              Value: true
             - Alpha: 1
               Buffer Length: 1
               Class: rviz/Path
@@ -358,9 +356,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -488,9 +484,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -618,9 +612,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -748,9 +740,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -878,9 +868,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1008,9 +996,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1138,9 +1124,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1268,9 +1252,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1398,9 +1380,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1528,9 +1508,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1658,9 +1636,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1788,9 +1764,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -1918,9 +1892,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2048,9 +2020,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2178,9 +2148,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2308,9 +2276,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2438,9 +2404,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2568,9 +2532,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2698,9 +2660,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2828,9 +2788,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -2958,9 +2916,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -3096,9 +3052,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -3234,9 +3188,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -3372,9 +3324,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -3510,9 +3460,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -3648,9 +3596,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -3786,9 +3732,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -3924,9 +3868,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -4062,9 +4004,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -4200,9 +4140,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -4338,9 +4276,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -4476,9 +4412,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -4614,9 +4548,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -4752,9 +4684,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -4890,9 +4820,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -5028,9 +4956,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -5166,9 +5092,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -5304,9 +5228,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -5442,9 +5364,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -5580,9 +5500,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -5718,9 +5636,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -5856,9 +5772,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: false
               Max Color: 255; 255; 255
-              Max Intensity: 4096
               Min Color: 0; 0; 0
-              Min Intensity: 0
               Name: map inflate
               Position Transformer: XYZ
               Queue Size: 10
@@ -6020,8 +5934,8 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz/ThirdPersonFollower
-      Distance: 37.622615814208984
+      Class: rviz/XYOrbit
+      Distance: 9.574191093444824
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -6029,17 +5943,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 1.8392597436904907
-        Y: -6.51273775100708
-        Z: -1.1761690984712914e-05
+        X: 1.9975614547729492
+        Y: -4.495184898376465
+        Z: 0
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0.6503983736038208
       Target Frame: <Fixed Frame>
-      Yaw: 4.7064595222473145
+      Yaw: 6.028583526611328
     Saved:
       - Class: rviz/FPS
         Enable Stereo Rendering:
@@ -6107,7 +6021,7 @@ Visualization Manager:
         Focal Shape Fixed Size: true
         Focal Shape Size: 0.05000000074505806
         Invert Z Axis: false
-        Name: 钻洞对比
+        Name: HoleComparison
         Near Clip Distance: 0.009999999776482582
         Pitch: 0.44479724764823914
         Target Frame: my_view
@@ -6175,10 +6089,10 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1403
+  Height: 1183
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001c500000521fc0200000039fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002be000000c900fffffffb0000000a0056006900650077007301000003010000025d000000a400fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d00650072006100000001d1000000b50000000000000000fb0000000a0049006d00610067006502000001a2000001e1000000f8000000b5fb0000000a006400650070007400680000000265000000c00000001600fffffffb0000000a0049006d00610067006501000003f30000015b0000000000000000fb0000000a0049006d00610067006501000003f4000001190000000000000000fb0000000a0064006500700074006800000004a2000000ac0000001600fffffffb0000000a006400650070007400680000000346000002180000001600fffffffb0000000a0064006500700074006800000003e20000017c0000001600fffffffb0000000a006400650070007400680000000481000000cd0000001600fffffffb0000000a006400650070007400680000000429000001250000001600fffffffb0000000a0064006500700074006800000003b7000000af0000001600fffffffb0000000a0064006500700074006800000003d5000000b50000001600fffffffb0000000a006400650070007400680000000444000001260000001600fffffffb0000000a00640065007000740068000000041f0000014b0000001600fffffffb0000000a0064006500700074006800000001b8000000160000001600fffffffb0000000a0064006500700074006800000001c1000000160000001600fffffffb0000000a0064006500700074006800000004b1000000550000001600fffffffb0000000a006400650070007400680000000505000000650000001600fffffffb0000000a006400650070007400680000000502000000680000001600fffffffb0000000a0064006500700074006800000004f9000000710000001600fffffffb0000000a0064006500700074006800000003dd0000018d0000001600fffffffb0000000a0064006500700074006800000004de0000008c0000001600fffffffb0000000a0064006500700074006800000004cc0000009e0000001600fffffffb0000000a00640065007000740068000000048a000000c40000001600fffffffb0000000a0064006500700074006800000004aa000000c00000001600fffffffb0000000a0049006d00610067006500000003fa000001540000000000000000fb0000000a0049006d00610067006501000002e1000002890000000000000000fb0000000a006400650070007400680000000495000000d50000001600fffffffb0000000a0064006500700074006800000001b60000001b0000001600fffffffb0000000a0064006500700074006800000001c10000002f0000001600fffffffb0000000a0064006500700074006800000001d3000000300000001600fffffffb0000000a0064006500700074006800000001e6000000320000001600fffffffb0000000a0064006500700074006800000004dc0000008e0000001600fffffffb0000000a0064006500700074006800000004f4000000760000001600fffffffb0000000a0064006500700074006800000004f2000000780000001600fffffffb0000000a006400650070007400680000000503000000670000001600fffffffb0000000a006400650070007400680000000509000000610000001600fffffffb0000000a006400650070007400680000000511000000590000001600fffffffb0000000a006400650070007400680000000517000000530000001600fffffffb0000000a00640065007000740068000000051d0000004d0000001600fffffffb0000000a00640065007000740068000000051d0000004d0000001600fffffffb0000000a006400650070007400680000000526000000440000001600fffffffb0000000a00640065007000740068000000052b0000003f0000001600fffffffb0000000a00640065007000740068000000052b0000003f0000001600fffffffb0000000a00640065007000740068000000052f0000003b0000001600fffffffb0000000a006400650070007400680000000532000000380000001600fffffffb0000000a006400650070007400680000000536000000340000001600fffffffb0000000a00640065007000740068000000046b000000d80000001600ffffff000000010000010f00000385fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006100000003bfc0100000002fb0000000800540069006d0065000000000000000610000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000008350000052100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001c500000423fc0200000039fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000008600fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000056000002350000012600fffffffb0000000a005600690065007700730100000294000001e5000000ec00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d00650072006100000001d1000000b50000000000000000fb0000000a0049006d00610067006502000001a2000001e1000000f8000000b5fb0000000a006400650070007400680000000265000000c00000001e00fffffffb0000000a0049006d00610067006501000003f30000015b0000000000000000fb0000000a0049006d00610067006501000003f4000001190000000000000000fb0000000a0064006500700074006800000004a2000000ac0000001e00fffffffb0000000a006400650070007400680000000346000002180000001e00fffffffb0000000a0064006500700074006800000003e20000017c0000001e00fffffffb0000000a006400650070007400680000000481000000cd0000001e00fffffffb0000000a006400650070007400680000000429000001250000001e00fffffffb0000000a0064006500700074006800000003b7000000af0000001e00fffffffb0000000a0064006500700074006800000003d5000000b50000001e00fffffffb0000000a006400650070007400680000000444000001260000001e00fffffffb0000000a00640065007000740068000000041f0000014b0000001e00fffffffb0000000a0064006500700074006800000001b8000000160000001e00fffffffb0000000a0064006500700074006800000001c1000000160000001e00fffffffb0000000a0064006500700074006800000004b1000000550000001e00fffffffb0000000a006400650070007400680000000505000000650000001e00fffffffb0000000a006400650070007400680000000502000000680000001e00fffffffb0000000a0064006500700074006800000004f9000000710000001e00fffffffb0000000a0064006500700074006800000003dd0000018d0000001e00fffffffb0000000a0064006500700074006800000004de0000008c0000001e00fffffffb0000000a0064006500700074006800000004cc0000009e0000001e00fffffffb0000000a00640065007000740068000000048a000000c40000001e00fffffffb0000000a0064006500700074006800000004aa000000c00000001e00fffffffb0000000a0049006d00610067006500000003fa000001540000000000000000fb0000000a0049006d00610067006501000002e1000002890000000000000000fb0000000a006400650070007400680000000495000000d50000001e00fffffffb0000000a0064006500700074006800000001b60000001b0000001e00fffffffb0000000a0064006500700074006800000001c10000002f0000001e00fffffffb0000000a0064006500700074006800000001d3000000300000001e00fffffffb0000000a0064006500700074006800000001e6000000320000001e00fffffffb0000000a0064006500700074006800000004dc0000008e0000001e00fffffffb0000000a0064006500700074006800000004f4000000760000001e00fffffffb0000000a0064006500700074006800000004f2000000780000001e00fffffffb0000000a006400650070007400680000000503000000670000001e00fffffffb0000000a006400650070007400680000000509000000610000001e00fffffffb0000000a006400650070007400680000000511000000590000001e00fffffffb0000000a006400650070007400680000000517000000530000001e00fffffffb0000000a00640065007000740068000000051d0000004d0000001e00fffffffb0000000a00640065007000740068000000051d0000004d0000001e00fffffffb0000000a006400650070007400680000000526000000440000001e00fffffffb0000000a00640065007000740068000000052b0000003f0000001e00fffffffb0000000a00640065007000740068000000052b0000003f0000001e00fffffffb0000000a00640065007000740068000000052f0000003b0000001e00fffffffb0000000a006400650070007400680000000532000000380000001e00fffffffb0000000a006400650070007400680000000536000000340000001e00fffffffb0000000a00640065007000740068000000046b000000d80000001e00ffffff000000010000010f00000385fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006100000003bfc0100000002fb0000000800540069006d0065000000000000000610000004e300fffffffb0000000800540069006d00650100000000000004500000000000000000000009720000042300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -6187,8 +6101,8 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2560
-  X: 2560
-  Y: 0
+  Width: 2880
+  X: 366
+  Y: 41
   depth:
     collapsed: false

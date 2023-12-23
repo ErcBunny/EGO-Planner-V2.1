@@ -24,14 +24,53 @@
     <arg name="target4_x" default="0.0"/>
     <arg name="target4_y" default="0.0"/>
     <arg name="target4_z" default="0.0"/>
+
+    <!-- new in V2.1 start -->
+
+    <!-- range z: different meaning between grid_map.cpp and grid_map_bigmap.cpp -->
+    <arg name="local_map_update_range_x" default="5.5"/>
+    <arg name="local_map_update_range_y" default="5.5"/>
+    <arg name="local_map_update_range_z" default="5.5"/>
+    <!-- fading_time = -1: do not fade away -->
+    <arg name="map_fading_time" default="-1"/>
+
+    <arg name="max_vel" default="1.5"/>
+    <arg name="max_acc" default="6.0"/>
+    <arg name="max_jer" default="20.0"/>
+
+    <arg name="enable_angular_constraints" default="0"/>
+    <arg name="max_angular_vel" default="1"/>
+    <arg name="max_angular_acc" default="2"/>
+
+    <arg name="drone_type" default="0"/>
+    <arg name="agent_height" default="1.5"/>
+    <arg name="agent_radius" default="0.2"/>
+
+    <arg name="auto_start_delay_sec" default="5"/>
+    <arg name="constraint_points_perPiece" default="5"/>
+    <arg name="rdp_eps" default="0.3"/>
+
+    <!-- for traj server -->
+    <arg name="diffdrive_use_mpc" default="1"/>
+    <arg name="cmd_vel_thresh" default="0.01"/>
+
+    <!-- new in V2.1 end -->
+
     <!-- topic of your odometry such as VIO or LIO -->
     <arg name="odom_topic"/>
     <!-- main algorithm params -->
     <include file="$(find node_launcher)/launch/include/advanced_param.xml">
+        <arg name="drone_type" value="$(arg drone_type)"/>
         <arg name="drone_id" value="$(arg drone_id)"/>
+        <arg name="body_height" value="$(arg agent_height)"/>
+        <arg name="body_radius" value="$(arg agent_radius)"/>
         <arg name="map_size_x_" value="$(arg map_size_x)"/>
         <arg name="map_size_y_" value="$(arg map_size_y)"/>
         <arg name="map_size_z_" value="$(arg map_size_z)"/>
+        <arg name="local_map_update_range_x" value="$(arg local_map_update_range_x)"/>
+        <arg name="local_map_update_range_y" value="$(arg local_map_update_range_y)"/>
+        <arg name="local_map_update_range_z" value="$(arg local_map_update_range_z)"/>
+        <arg name="map_fading_time" value="$(arg map_fading_time)"/>
         <arg name="odometry_topic" value="$(arg odom_topic)"/>
         <!-- camera pose: transform of camera frame in the world frame -->
         <!-- depth topic: depth image, 640x480 by default -->
@@ -47,9 +86,15 @@
         <arg name="fx" value="387.229248046875"/>
         <arg name="fy" value="387.229248046875"/>
         <!-- maximum velocity, acceleration and jerk the drone will reach -->
-        <arg name="max_vel" value="1.5"/>
-        <arg name="max_acc" value="6.0"/>
-        <arg name="max_jer" value="20.0"/>
+        <arg name="max_vel" value="$(arg max_vel)"/>
+        <arg name="max_acc" value="$(arg max_acc)"/>
+        <arg name="max_jer" value="$(arg max_jer)"/>
+        <arg name="enable_angular_constraints" value="$(arg enable_angular_constraints)"/>
+        <arg name="max_angular_vel" value="$(arg max_angular_vel)"/>
+        <arg name="max_angular_acc" value="$(arg max_angular_acc)"/>
+        <arg name="auto_start_delay_sec" value="$(arg auto_start_delay_sec)"/>
+        <arg name="constraint_points_perPiece" value="$(arg constraint_points_perPiece)"/>
+        <arg name="rdp_eps" value="$(arg rdp_eps)"/>
         <!--always set to 1.5 times grater than sensing horizen-->
         <arg name="planning_horizon" value="7.5"/>
         <arg name="use_multitopology_trajs" value="false"/>
@@ -80,6 +125,12 @@
         <remap from="position_cmd" to="drone_$(arg drone_id)_planning/pos_cmd"/>
         <remap from="~planning/trajectory" to="drone_$(arg drone_id)_planning/trajectory"/>
         <param name="traj_server/time_forward" value="1.0" type="double"/>
+        <param name="traj_server/drone_type" value="$(arg drone_type)" type="int"/>
+        <param name="traj_server/cmd_vel_thresh" value="$(arg cmd_vel_thresh)" type="double"/>
+        <param name="traj_server/init_x" value="$(arg init_x)" type="double"/>
+        <param name="traj_server/init_y" value="$(arg init_y)" type="double"/>
+        <param name="traj_server/init_z" value="$(arg init_z)" type="double"/>
+        <param name="traj_server/diffdrive_use_mpc" value="$(arg diffdrive_use_mpc)" type="int"/>
     </node>
     <!-- use simulator -->
     <include file="$(find node_launcher)/launch/include/simulator.xml">
@@ -91,6 +142,7 @@
         <arg name="init_y_" value="$(arg init_y)"/>
         <arg name="init_z_" value="$(arg init_z)"/>
         <arg name="odometry_topic" value="$(arg odom_topic)"/>
+        <arg name="drone_type" value="$(arg drone_type)"/>
     </include>
     <include file="$(find simulator)/launch/manual_take_over/take_over_drone.launch">
         <arg name="drone_id" value="$(arg drone_id)"/>

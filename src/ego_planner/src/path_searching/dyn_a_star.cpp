@@ -63,8 +63,8 @@ double AStar::getEuclHeu(GridNodePtr node1, GridNodePtr node2) {
     return (node2->index - node1->index).norm();
 }
 
-vector <GridNodePtr> AStar::retrievePath(GridNodePtr current) {
-    vector <GridNodePtr> path;
+vector<GridNodePtr> AStar::retrievePath(GridNodePtr current) {
+    vector<GridNodePtr> path;
     path.push_back(current);
 
     while (current->cameFrom != NULL) {
@@ -118,7 +118,7 @@ bool AStar::ConvertToIndexAndAdjustStartEndPoints(Vector3d start_pt, Vector3d en
     return true;
 }
 
-ASTAR_RET AStar::AstarSearch(const double step_size, Vector3d start_pt, Vector3d end_pt) {
+ASTAR_RET AStar::AstarSearch(const double step_size, Vector3d start_pt, Vector3d end_pt, bool disable_vertical_search) {
     ros::Time time_1 = ros::Time::now();
     ++rounds_;
 
@@ -138,7 +138,7 @@ ASTAR_RET AStar::AstarSearch(const double step_size, Vector3d start_pt, Vector3d
     GridNodePtr startPtr = GridNodeMap_[start_idx(0)][start_idx(1)][start_idx(2)];
     GridNodePtr endPtr = GridNodeMap_[end_idx(0)][end_idx(1)][end_idx(2)];
 
-    std::priority_queue <GridNodePtr, std::vector<GridNodePtr>, NodeComparator> empty;
+    std::priority_queue<GridNodePtr, std::vector<GridNodePtr>, NodeComparator> empty;
     openSet_.swap(empty);
 
     GridNodePtr neighborPtr = NULL;
@@ -179,6 +179,8 @@ ASTAR_RET AStar::AstarSearch(const double step_size, Vector3d start_pt, Vector3d
         for (int dx = -1; dx <= 1; dx++)
             for (int dy = -1; dy <= 1; dy++)
                 for (int dz = -1; dz <= 1; dz++) {
+                    if (disable_vertical_search && dz != 0)
+                        continue;
                     if (dx == 0 && dy == 0 && dz == 0)
                         continue;
 
@@ -239,8 +241,8 @@ ASTAR_RET AStar::AstarSearch(const double step_size, Vector3d start_pt, Vector3d
     return ASTAR_RET::SEARCH_ERR;
 }
 
-vector <Vector3d> AStar::getPath() {
-    vector <Vector3d> path;
+vector<Vector3d> AStar::getPath() {
+    vector<Vector3d> path;
 
     for (auto ptr: gridPath_)
         path.push_back(Index2Coord(ptr->index));

@@ -3,11 +3,11 @@
     <arg name="map_size_y" value="50.0"/>
     <arg name="map_size_z" value=" 3.0"/>
     <arg name="odom_topic" value="visual_slam/odom"/>
-    
+
     <node name="rviz" pkg="rviz" type="rviz"
           args="-d $(find node_launcher)/config/default.rviz"
     />
-    
+
     <!-- swarm topic transmitter bridge-->
     <include file="$(find ego_planner)/launch/bridge_udp.launch">
         <arg name="drone_id" value="999"/>
@@ -20,12 +20,12 @@
         <param name="map/z_size" value="3"/>
         <param name="map/resolution" value="0.1"/>
         <param name="ObstacleShape/seed" value="1"/>
-        <param name="map/obs_num" value="100"/>
+        <param name="map/obs_num" value="50"/>
         <param name="ObstacleShape/lower_rad" value="0.5"/>
         <param name="ObstacleShape/upper_rad" value="0.7"/>
         <param name="ObstacleShape/lower_hei" value="0.0"/>
         <param name="ObstacleShape/upper_hei" value="3.0"/>
-        <param name="map/circle_num" value="100"/>
+        <param name="map/circle_num" value="50"/>
         <param name="ObstacleShape/radius_l" value="0.7"/>
         <param name="ObstacleShape/radius_h" value="0.5"/>
         <param name="ObstacleShape/z_l" value="0.7"/>
@@ -37,6 +37,7 @@
 
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="0"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="-9.0"/>
         <arg name="init_z" value="0"/>
@@ -50,6 +51,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="1"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="-7.0"/>
         <arg name="init_z" value="0"/>
@@ -63,6 +65,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="2"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="-5.0"/>
         <arg name="init_z" value="0"/>
@@ -76,6 +79,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="3"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="-3.0"/>
         <arg name="init_z" value="0"/>
@@ -89,6 +93,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="4"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="-1.0"/>
         <arg name="init_z" value="0"/>
@@ -102,6 +107,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="5"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="1.0"/>
         <arg name="init_z" value="0"/>
@@ -115,6 +121,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="6"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="3.0"/>
         <arg name="init_z" value="0"/>
@@ -128,6 +135,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="7"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="5.0"/>
         <arg name="init_z" value="0"/>
@@ -141,6 +149,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="8"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="7.0"/>
         <arg name="init_z" value="0"/>
@@ -154,6 +163,7 @@
     </include>
     <include file="$(find node_launcher)/launch/include/run_in_sim.xml">
         <arg name="drone_id" value="9"/>
+        <arg name="drone_type" value="0"/>
         <arg name="init_x" value="-15.0"/>
         <arg name="init_y" value="9.0"/>
         <arg name="init_z" value="0"/>

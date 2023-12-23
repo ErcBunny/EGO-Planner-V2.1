@@ -10,6 +10,8 @@
 #include <ros/ros.h>
 #include <traj_utils/planning_visualization.h>
 #include <optimizer/poly_traj_utils.hpp>
+#include <path_searching/dyn_a_star.h>
+#include <path_searching/ompl_search.h>
 
 namespace ego_planner {
 
@@ -40,6 +42,14 @@ namespace ego_planner {
                 const Eigen::Vector3d &end_vel, const bool flag_polyInit,
                 const bool flag_randomPolyTraj, const bool touch_goal);
 
+        bool astarSearchPath(const Eigen::Vector3d &start_point, const Eigen::Vector3d &end_point,
+                             bool disable_vertical_search, bool do_visualize,
+                             std::vector<Eigen::Vector3d> &path_points);
+
+        bool omplSearchPath(const Eigen::Vector3d &start_point, const Eigen::Vector3d &end_point,
+                            double xy_range, double z_lb, double z_ub, double timeout, bool do_visualize,
+                            std::vector<Eigen::Vector3d> &path_points);
+
         bool planGlobalTrajWaypoints(
                 const Eigen::Vector3d &start_pos, const Eigen::Vector3d &start_vel,
                 const Eigen::Vector3d &start_acc, const std::vector<Eigen::Vector3d> &waypoints,
@@ -65,6 +75,7 @@ namespace ego_planner {
         PlanParameters pp_;
         GridMap::Ptr grid_map_;
         TrajContainer traj_;
+        OMPLSearch *ompl_search;
 
     private:
         PlanningVisualization::Ptr visualization_;

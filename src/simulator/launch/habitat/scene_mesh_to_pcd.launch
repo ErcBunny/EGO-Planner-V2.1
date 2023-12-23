@@ -1,0 +1,19 @@
+<launch>
+
+    <arg name="mesh_sampling_points" default="1000000"/>
+    <arg name="global_pcd_downsample_voxel_size" default="0.1"/>
+    <arg name="global_pcd_publish_topic" default="/map_generator/global_cloud"/>
+    <arg name="global_pcd_reference_frame" default="map"/>
+    <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/17DRP5sb8fy.glb"/>
+
+    <node pkg="simulator" name="scene_mesh_to_pcd" type="scene_mesh_to_pcd.py" output="screen">
+        <param name="mesh_sampling_points" type="int" value="$(arg mesh_sampling_points)"/>
+        <param name="global_pcd_downsample_voxel_size" type="double" value="$(arg global_pcd_downsample_voxel_size)"/>
+        <param name="global_pcd_publish_topic" type="str" value="$(arg global_pcd_publish_topic)"/>
+        <param name="global_pcd_reference_frame" type="str" value="$(arg global_pcd_reference_frame)"/>
+        <param name="scene_id" type="str" value="$(arg scene_id)"/>
+    </node>
+
+    <node pkg="rviz" name="rviz" type="rviz" args="-d $(find simulator)/config/scene_pcd.rviz"/>
+
+</launch>

@@ -1,0 +1,91 @@
+<launch>
+    <arg name="init_x_"/>
+    <arg name="init_y_"/>
+    <arg name="init_z_"/>
+    <arg name="odometry_topic"/>
+    <arg name="drone_id"/>
+
+    <arg name="gpu_device_id" default="-1"/>
+    <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/17DRP5sb8fy.glb"/>
+    <arg name="scene_dataset_config_file"
+         default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/mp3d.scene_dataset_config.json"/>
+
+    <arg name="drone_type" default="0"/>
+    <arg name="agent_type" default="terrestrial"/>
+    <arg name="agent_height" default="1.5"/>
+    <arg name="agent_radius" default="0.1"/>
+    <arg name="terrestrial_operating_height" default="0"/>
+    <arg name="crop_point_cloud_offset_gnd" default="0.05"/>
+    <arg name="crop_point_cloud_offset_top" default="0.05"/>
+    <arg name="frame_id_mesh" default="map"/>
+    <arg name="depth_img_trunc_meter" default="4"/>
+
+    <arg name="fps" default="30"/>
+    <arg name="image_height" default="480"/>
+    <arg name="image_width" default="640"/>
+    <arg name="image_hfov" default="90"/>
+    <arg name="camera_position_x" default="0"/>
+    <arg name="camera_position_y" default="0"/>
+    <arg name="camera_position_z" default="1.25"/>
+    <arg name="camera_orientation_x" default="0"/>
+    <arg name="camera_orientation_y" default="0"/>
+    <arg name="camera_orientation_z" default="0"/>
+
+    <arg name="color_image_raw_topic"/>
+    <arg name="depth_image_raw_topic"/>
+    <arg name="local_pcd_topic"/>
+    <arg name="local_pcd_aux_topic"/>
+
+    <node pkg="simulator" name="drone_$(arg drone_id)_poscmd_2_odom" type="poscmd_2_odom" output="screen">
+        <param name="init_x" value="$(arg init_x_)"/>
+        <param name="init_y" value="$(arg init_y_)"/>
+        <param name="init_z" value="$(arg init_z_)"/>
+        <param name="drone_type" value="$(arg drone_type)"/>
+        <remap from="~command" to="drone_$(arg drone_id)_planning/pos_cmd"/>
+        <remap from="~odometry" to="drone_$(arg drone_id)_$(arg odometry_topic)"/>
+    </node>
+
+    <node pkg="simulator" name="drone_$(arg drone_id)_odom_visualization" type="odom_visualization" output="screen">
+        <remap from="~odom" to="drone_$(arg drone_id)_visual_slam/odom"/>
+        <param name="color/a" value="1.0"/>
+        <param name="color/r" value="0.0"/>
+        <param name="color/g" value="0.0"/>
+        <param name="color/b" value="0.0"/>
+        <param name="covariance_scale" value="100.0"/>
+        <param name="robot_scale" value="0.35"/>
+        <param name="tf45" value="false"/>
+        <param name="drone_id" value="$(arg drone_id)"/>
+    </node>
+
+    <node pkg="simulator" type="habitat_renderer.py" name="drone_$(arg drone_id)_pcl_render_node" output="screen">
+        <param name="gpu_device_id" type="int" value="$(arg gpu_device_id)"/>
+        <param name="scene_id" type="str" value="$(arg scene_id)"/>
+        <param name="scene_dataset_config_file" type="str" value="$(arg scene_dataset_config_file)"/>
+
+        <param name="agent_type" type="str" value="$(arg agent_type)"/>
+        <param name="agent_height" type="double" value="$(arg agent_height)"/>
+        <param name="agent_radius" type="double" value="$(arg agent_radius)"/>
+        <param name="terrestrial_operating_height" type="double" value="$(arg terrestrial_operating_height)"/>
+        <param name="crop_point_cloud_offset_gnd" type="double" value="$(arg crop_point_cloud_offset_gnd)"/>
+        <param name="crop_point_cloud_offset_top" type="double" value="$(arg crop_point_cloud_offset_top)"/>
+        <param name="frame_id_mesh" type="str" value="$(arg frame_id_mesh)"/>
+        <param name="depth_img_trunc_meter" type="double" value="$(arg depth_img_trunc_meter)"/>
+
+        <param name="fps" type="int" value="$(arg fps)"/>
+        <param name="image_height" type="int" value="$(arg image_height)"/>
+        <param name="image_width" type="int" value="$(arg image_width)"/>
+        <param name="image_hfov" type="double" value="$(arg image_hfov)"/>
+        <param name="camera_position_x" type="double" value="$(arg camera_position_x)"/>
+        <param name="camera_position_y" type="double" value="$(arg camera_position_y)"/>
+        <param name="camera_position_z" type="double" value="$(arg camera_position_z)"/>
+        <param name="camera_orientation_x" type="double" value="$(arg camera_orientation_x)"/>
+        <param name="camera_orientation_y" type="double" value="$(arg camera_orientation_y)"/>
+        <param name="camera_orientation_z" type="double" value="$(arg camera_orientation_z)"/>
+
+        <param name="odom_topic" type="str" value="drone_$(arg drone_id)_$(arg odometry_topic)"/>
+        <param name="color_image_raw_topic" type="str" value="$(arg color_image_raw_topic)"/>
+        <param name="depth_image_raw_topic" type="str" value="$(arg depth_image_raw_topic)"/>
+        <param name="local_pcd_topic" type="str" value="$(arg local_pcd_topic)"/>
+        <param name="local_pcd_aux_topic" type="str" value="$(arg local_pcd_aux_topic)"/>
+    </node>
+</launch>

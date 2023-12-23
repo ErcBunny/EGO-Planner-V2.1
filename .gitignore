@@ -7,3 +7,5 @@ cmake-build-*
 src/CMakeLists.txt
 build
 devel
+
+acados_export*

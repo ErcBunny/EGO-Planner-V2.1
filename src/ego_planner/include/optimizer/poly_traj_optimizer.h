@@ -90,6 +90,10 @@ namespace ego_planner {
         double wei_time_;                                             // time weight
         double obs_clearance_, obs_clearance_soft_, swarm_clearance_; // safe distance
         double max_vel_, max_acc_, max_jer_;                          // dynamic limits
+        int enable_angular_constraint_;                               // if 1, angular constraint are considered in opt
+        double max_angular_vel_, max_angular_acc_;                    // for drone type: diff-drive
+        int drone_type_;                                              // 0: copter, 1: omni-drive, 2: diff-drive
+        double body_height_, body_radius_;
 
         double t_now_;
 
@@ -130,6 +134,8 @@ namespace ego_planner {
 
         inline double get_swarm_clearance_(void) { return swarm_clearance_; }
 
+        inline AStar::Ptr get_astar() { return a_star_; }
+
         /* main planning API */
         bool optimizeTrajectory(const Eigen::MatrixXd &iniState, const Eigen::MatrixXd &finState,
                                 const Eigen::MatrixXd &initInnerPts, const Eigen::VectorXd &initT,
@@ -149,7 +155,7 @@ namespace ego_planner {
         bool allowRebound(void);
 
         /* multi-topo support */
-        std::vector<ConstraintPoints> distinctiveTrajs(vector <std::pair<int, int>> segments);
+        std::vector<ConstraintPoints> distinctiveTrajs(vector<std::pair<int, int>> segments);
 
     private:
         /* callbacks by the L-BFGS optimizer */
@@ -204,6 +210,22 @@ namespace ego_planner {
                                   Eigen::Vector3d &gradj,
                                   double &costj);
 
+        bool feasibilityGradCostAngVelPositive(const double &ang_vel,
+                                               double &grad_ang_vel,
+                                               double &cost_ang_vel);
+
+        bool feasibilityGradCostAngVelNegative(const double &ang_vel,
+                                               double &grad_ang_vel,
+                                               double &cost_ang_vel);
+
+        bool feasibilityGradCostAngAccPositive(const double &ang_acc,
+                                               double &grad_ang_acc,
+                                               double &cost_ang_acc);
+
+        bool feasibilityGradCostAngAccNegative(const double &ang_acc,
+                                               double &grad_ang_acc,
+                                               double &cost_ang_acc);
+
         void distanceSqrVarianceWithGradCost2p(const Eigen::MatrixXd &ps,
                                                Eigen::MatrixXd &gdp,
                                                double &var);
@@ -214,7 +236,7 @@ namespace ego_planner {
                                           double &var);
 
     public:
-        typedef unique_ptr <PolyTrajOptimizer> Ptr;
+        typedef unique_ptr<PolyTrajOptimizer> Ptr;
     };
 
 } // namespace ego_planner
