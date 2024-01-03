@@ -7,7 +7,7 @@ Dec 23, 2023 update:
 * Angular Motion (non-holonomic) constraint
 * Heterogeneous swarm coordination
 * Habitat simulator integration
-* Path guided rebound & replan
+* Path guided local target selection
 
 Please refer to [documents](./doc/) for detailed description of new features and code modifications.
 
@@ -57,7 +57,7 @@ mamba activate ego
 python diffdrive_acados.py
 ```
 
-Go back to the top repo directory and build to workspace.
+Go back to the top repo directory and build the workspace.
 
 ```sh
 mamba activate ego

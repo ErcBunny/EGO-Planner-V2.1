@@ -11,8 +11,10 @@
     <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/17DRP5sb8fy.glb"/>
 
     <node name="rviz" pkg="rviz" type="rviz"
-          args="-d $(find node_launcher)/config/habitat.rviz"
+          args="-d $(find node_launcher)/config/habitat_single_gnd.rviz"
     />
+
+    <node name="tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 world map 1"/>
 
     <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
 

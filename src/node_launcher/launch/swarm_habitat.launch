@@ -11,10 +11,10 @@
     <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/17DRP5sb8fy.glb"/>
 
     <node name="rviz" pkg="rviz" type="rviz"
-          args="-d $(find node_launcher)/config/habitat.rviz"
+          args="-d $(find node_launcher)/config/habitat_multi.rviz"
     />
 
-    <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
+    <!-- <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/> -->
 
     <!-- swarm topic transmitter bridge-->
     <include file="$(find ego_planner)/launch/bridge_udp.launch">
@@ -120,7 +120,7 @@
         <arg name="camera_position_z" value="1.4"/>
         <arg name="constraint_points_perPiece" value="5"/>
 
-        <arg name="max_vel" value="0.5"/>
+        <arg name="max_vel" value="0.8"/>
         <arg name="max_acc" value="5.0"/>
         <arg name="max_jer" value="20.0"/>
 
