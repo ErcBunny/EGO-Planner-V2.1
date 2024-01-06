@@ -8,7 +8,7 @@
     <arg name="global_pcd_downsample_voxel_size" default="0.1"/>
     <arg name="global_pcd_publish_topic" default="/map_generator/global_cloud"/>
     <arg name="global_pcd_reference_frame" default="world"/>
-    <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/17DRP5sb8fy/17DRP5sb8fy.glb"/>
+    <arg name="scene_id" default="$(find simulator)/assets/habitat/mp3d_example/extra/29hnd4uzFmX.glb"/>
 
     <node name="rviz" pkg="rviz" type="rviz"
           args="-d $(find node_launcher)/config/habitat_single_air.rviz"
@@ -28,6 +28,7 @@
     </node>
 
     <include file="$(find node_launcher)/launch/include/run_in_habitat.xml">
+        <arg name="scene_id" default="$(arg scene_id)"/>
         <arg name="drone_id" value="0"/>
         <arg name="init_x" value="0.0"/>
         <arg name="init_y" value="0.0"/>

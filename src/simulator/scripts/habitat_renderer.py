@@ -107,6 +107,8 @@ class HabitatRenderer:
     local_point_cloud_pub: rospy.Publisher
     local_point_cloud_aux_pub: rospy.Publisher
 
+    placeholder_o3d_color_img: o3d.geometry.Image # for aux sensors
+
     def __init__(self) -> None:
         # sim config
         sim_cfg = habitat_sim.SimulatorConfiguration()
@@ -149,6 +151,10 @@ class HabitatRenderer:
             depth_sensor_spec_bottom.uuid = "depth_sensor_bottom"
             depth_sensor_spec_bottom.orientation = [-math.pi / 2, 0, 0]
             agent_cfg.sensor_specifications.append(depth_sensor_spec_bottom)
+
+            placeholder_rgb = np.zeros([480, 640, 3], dtype=np.uint8)
+            print(placeholder_rgb)
+            self.placeholder_o3d_color_img = o3d.geometry.Image(placeholder_rgb)
 
         self.simulator = habitat_sim.Simulator(
             habitat_sim.Configuration(sim_cfg, [agent_cfg])
@@ -282,14 +288,30 @@ class HabitatRenderer:
             o3d_depth_top = o3d.geometry.Image(depth_top)
             o3d_depth_bottom = o3d.geometry.Image(depth_bottom)
 
-            o3d_pcd_top = o3d.geometry.PointCloud.create_from_depth_image(
-                depth=o3d_depth_top, intrinsic=self.o3d_camera_intrinsic, extrinsic=np.eye(4)
+            o3d_rgbd_top = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                color=self.placeholder_o3d_color_img,
+                depth=o3d_depth_top,
+                depth_scale=1,
+                depth_trunc=self.depth_img_trunc_meter,
+                convert_rgb_to_intensity=False,
+            )
+
+            o3d_rgbd_bottom = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                color=self.placeholder_o3d_color_img,
+                depth=o3d_depth_bottom,
+                depth_scale=1,
+                depth_trunc=self.depth_img_trunc_meter,
+                convert_rgb_to_intensity=False,
+            )
+
+            o3d_pcd_top = o3d.geometry.PointCloud.create_from_rgbd_image(
+                image=o3d_rgbd_top, intrinsic=self.o3d_camera_intrinsic, extrinsic=np.eye(4)
             ).transform(
                 get_pcd_transform(self.agent.get_state().sensor_states["depth_sensor_top"])
             )
 
-            o3d_pcd_bottom = o3d.geometry.PointCloud.create_from_depth_image(
-                depth=o3d_depth_bottom, intrinsic=self.o3d_camera_intrinsic, extrinsic=np.eye(4)
+            o3d_pcd_bottom = o3d.geometry.PointCloud.create_from_rgbd_image(
+                image=o3d_rgbd_bottom, intrinsic=self.o3d_camera_intrinsic, extrinsic=np.eye(4)
             ).transform(
                 get_pcd_transform(self.agent.get_state().sensor_states["depth_sensor_bottom"])
             )

@@ -105,7 +105,7 @@
         <param name="grid_map/local_update_range_z" value="$(arg local_map_update_range_z)"/>
         <param name="grid_map/obstacles_inflation" value="0.1"/>
         <param name="grid_map/local_map_margin" value="10"/>
-        <param name="grid_map/enable_virtual_wall" value="true"/>
+        <param name="grid_map/enable_virtual_wall" value="false"/>
         <param name="grid_map/virtual_ceil" value="3.0"/>
         <param name="grid_map/virtual_ground" value="-0.1"/>
         <param name="grid_map/ground_height" value="-0.01"/>

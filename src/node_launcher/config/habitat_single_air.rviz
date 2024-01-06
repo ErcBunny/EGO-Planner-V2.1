@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /simulation_map1/Autocompute Value Bounds1
+        - /drone01
         - /drone01/Planning1/drone_path1/Offset1
         - /drone01/Mapping1
         - /drone01/Mapping1/map inflate1
@@ -119,8 +120,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 2.5492727756500244
-        Min Value: -0.021485084667801857
+        Max Value: 5.708967685699463
+        Min Value: -0.3601098358631134
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -169,7 +170,7 @@ Visualization Manager:
               Marker Topic: /drone_0_ego_planner_node/optimal_list
               Name: optimal_traj
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -193,7 +194,7 @@ Visualization Manager:
               Marker Topic: /drone_0_ego_planner_node/init_list
               Name: InitTraj
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
               Value: true
             - Alpha: 1
@@ -224,17 +225,17 @@ Visualization Manager:
           Name: Planning
         - Class: rviz/Group
           Displays:
-            - Alpha: 1
+            - Alpha: 0.10000000149011612
               Autocompute Intensity Bounds: true
               Autocompute Value Bounds:
-                Max Value: 2.6500000953674316
-                Min Value: -0.05000000074505806
+                Max Value: 6.050000190734863
+                Min Value: -0.44999998807907104
                 Value: true
               Axis: Z
               Channel Name: intensity
               Class: rviz/PointCloud2
               Color: 29; 108; 212
-              Color Transformer: AxisColor
+              Color Transformer: FlatColor
               Decay Time: 0
               Enabled: true
               Invert Rainbow: false
@@ -246,13 +247,13 @@ Visualization Manager:
               Selectable: false
               Size (Pixels): 4
               Size (m): 0.10000000149011612
-              Style: Boxes
+              Style: Flat Squares
               Topic: /drone_0_ego_planner_node/grid_map/occupancy_inflate
               Unreliable: false
               Use Fixed Frame: true
               Use rainbow: true
               Value: true
-          Enabled: false
+          Enabled: true
           Name: Mapping
         - Class: rviz/Group
           Displays:
@@ -310,7 +311,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 4.57716703414917
+      Distance: 15.605060577392578
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -326,9 +327,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.17039859294891357
+      Pitch: 0.7303987741470337
       Target Frame: <Fixed Frame>
-      Yaw: 3.795402765274048
+      Yaw: 5.130332946777344
     Saved:
       - Class: rviz/FPS
         Enable Stereo Rendering:
