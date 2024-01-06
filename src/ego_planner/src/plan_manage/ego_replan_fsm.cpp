@@ -769,7 +769,7 @@ namespace ego_planner {
     }
 
     void EGOReplanFSM::waypointCallback(const quadrotor_msgs::GoalSetPtr &msg) {
-        if (msg->drone_id != planner_manager_->pp_.drone_id || msg->goal[2] < -0.1)
+        if (msg->drone_id != planner_manager_->pp_.drone_id) // || msg->goal[2] < -0.1)
             return;
 
         ROS_INFO("Received goal: %f, %f, %f", msg->goal[0], msg->goal[1], msg->goal[2]);

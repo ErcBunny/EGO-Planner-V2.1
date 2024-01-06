@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /simulation_map1
         - /simulation_map1/Autocompute Value Bounds1
         - /drone01
         - /drone01/Planning1/drone_path1/Offset1
@@ -65,7 +66,7 @@ Visualization Manager:
       Plane Cell Count: 1000
       Reference Frame: <Fixed Frame>
       Value: true
-    - Alpha: 1
+    - Alpha: 0.10000000149011612
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
         Max Value: 2.9000000953674316
@@ -87,7 +88,7 @@ Visualization Manager:
       Selectable: false
       Size (Pixels): 3
       Size (m): 0.10000000149011612
-      Style: Points
+      Style: Flat Squares
       Topic: /map_generator/global_cloud
       Unreliable: false
       Use Fixed Frame: true
@@ -120,8 +121,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 5.708967685699463
-        Min Value: -0.3601098358631134
+        Max Value: 1.3465338945388794
+        Min Value: -1.0988259315490723
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -170,7 +171,7 @@ Visualization Manager:
               Marker Topic: /drone_0_ego_planner_node/optimal_list
               Name: optimal_traj
               Namespaces:
-                "": true
+                {}
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -194,7 +195,7 @@ Visualization Manager:
               Marker Topic: /drone_0_ego_planner_node/init_list
               Name: InitTraj
               Namespaces:
-                "": true
+                {}
               Queue Size: 100
               Value: true
             - Alpha: 1

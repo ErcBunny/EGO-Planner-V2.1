@@ -28,6 +28,7 @@
     </node>
 
     <include file="$(find node_launcher)/launch/include/run_in_habitat.xml">
+        <arg name="scene_id" default="$(arg scene_id)"/>
         <arg name="drone_id" value="0"/>
         <arg name="init_x" value="0.0"/>
         <arg name="init_y" value="0.0"/>
