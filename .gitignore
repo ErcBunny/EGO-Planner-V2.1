@@ -9,3 +9,9 @@ build
 devel
 
 acados_export*
+
+src/simulator/assets/cmu/campus
+src/simulator/assets/cmu/forest
+src/simulator/assets/cmu/garage
+src/simulator/assets/cmu/indoor
+src/simulator/assets/cmu/tunnel

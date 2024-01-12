@@ -212,6 +212,7 @@ catkin_install_python(PROGRAMS
         scripts/habitat_viewer.py
         scripts/scene_mesh_to_pcd.py
         scripts/habitat_renderer.py
+        scripts/cmu_env_pcd_publisher.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
