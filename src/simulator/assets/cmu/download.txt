@@ -1,0 +1,128 @@
+https://drive.google.com/file/d/1GMT8tptb3nAb87F8eFfmIgjma6Bu0reV/view?pli=1
+
+download and unzip
+
+assets/cmu
+├── campus
+│   ├── meshes
+│   │   ├── bark1.jpg
+│   │   ├── campus.dae
+│   │   ├── leaf3.png.002.png
+│   │   ├── photo_2020-11-01_11-54-02.jpg
+│   │   ├── photo_2020-11-01_11-56-17.jpg
+│   │   ├── texture_1001.png.001.png
+│   │   ├── texture_1002.png.001.png
+│   │   ├── texture_1003.png.001.png
+│   │   ├── texture_1004.png.001.png
+│   │   └── texture_1005.png.001.png
+│   ├── model.config
+│   ├── model.sdf
+│   └── preview
+│       ├── overview.png
+│       └── pointcloud.ply
+├── download.txt
+├── forest
+│   ├── grey_wall
+│   │   ├── materials
+│   │   │   ├── scripts
+│   │   │   │   └── grey_wall.material
+│   │   │   └── textures
+│   │   │       └── grey_wall.png
+│   │   ├── model-1_3.sdf
+│   │   ├── model-1_4.sdf
+│   │   ├── model.config
+│   │   └── model.sdf
+│   ├── house_1
+│   │   ├── materials
+│   │   │   ├── scripts
+│   │   │   │   └── house_1.material
+│   │   │   └── textures
+│   │   │       ├── House_1_Diffuse.png
+│   │   │       ├── House_1_Normal.png
+│   │   │       └── House_1_Spec.png
+│   │   ├── meshes
+│   │   │   └── house_1.dae
+│   │   ├── model-1_3.sdf
+│   │   ├── model-1_4.sdf
+│   │   ├── model.config
+│   │   └── model.sdf
+│   ├── house_2
+│   │   ├── materials
+│   │   │   ├── scripts
+│   │   │   │   └── house_2.material
+│   │   │   └── textures
+│   │   │       └── House_2_Diffuse.png
+│   │   ├── meshes
+│   │   │   └── house_2.dae
+│   │   ├── model-1_3.sdf
+│   │   ├── model-1_4.sdf
+│   │   ├── model.config
+│   │   └── model.sdf
+│   ├── oak_tree
+│   │   ├── materials
+│   │   │   ├── scripts
+│   │   │   │   ├── caster_fp.glsl
+│   │   │   │   ├── caster_vp.glsl
+│   │   │   │   └── oak_tree.material
+│   │   │   └── textures
+│   │   │       ├── bark_diffuse.png
+│   │   │       └── branch_diffuse.png
+│   │   ├── meshes
+│   │   │   └── oak_tree.dae
+│   │   ├── model.config
+│   │   └── model.sdf
+│   ├── pine_tree
+│   │   ├── materials
+│   │   │   ├── scripts
+│   │   │   │   └── pine_tree.material
+│   │   │   └── textures
+│   │   │       ├── bark_diffuse.png
+│   │   │       └── branch_2_diffuse.png
+│   │   ├── meshes
+│   │   │   └── pine_tree.dae
+│   │   ├── model.config
+│   │   └── model.sdf
+│   ├── preview
+│   │   ├── overview.png
+│   │   └── pointcloud.ply
+│   └── vrc_driving_terrain
+│       ├── materials
+│       │   ├── scripts
+│       │   │   └── grass.material
+│       │   └── textures
+│       │       ├── grass_dry.png
+│       │       └── heightmap.png
+│       ├── model.config
+│       └── model.sdf
+├── garage
+│   ├── meshes
+│   │   ├── blue-concrete-texture-3.jpg
+│   │   ├── garage.dae
+│   │   ├── imgonline-com-ua-tile-pLFAF53NCY1Spr.jpg
+│   │   ├── imgonline-com-ua-tile-RySXiqZBriXUB4J.jpg
+│   │   └── imgonline-com-ua-tile-turvdQ7ZY0r.jpg
+│   ├── model.config
+│   ├── model.sdf
+│   └── preview
+│       ├── overview.png
+│       └── pointcloud.ply
+├── indoor
+│   ├── meshes
+│   │   ├── imgonline-com-ua-tile-K49qRoCnvbl.jpg
+│   │   ├── imgonline-com-ua-tile-PQCma89EHs3BX1.jpg
+│   │   ├── imgonline-com-ua-tile-RySXiqZBriXUB4J.jpg
+│   │   └── indoor.dae
+│   ├── model.config
+│   ├── model.sdf
+│   └── preview
+│       ├── overview.png
+│       └── pointcloud.ply
+└── tunnel
+    ├── meshes
+    │   ├── tunnel.dae
+    │   └── wall_texture.jpg
+    ├── model.config
+    ├── model.sdf
+    └── preview
+        ├── overview.png
+        └── pointcloud.ply
