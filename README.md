@@ -15,7 +15,7 @@ The `main_ws` branch represents a streamlined version of the `main_ws` in [EGO P
 
 ## Environment Setup
 
-To set up the environment, follow the steps below. We recommend using a virtual environment. But you can also use the system-installed ROS and install `habitat-sim` using source or `pip` associated with the ROS Python interpreter.
+To set up the environment, follow the steps below. We recommend using a virtual environment. You can also use the system-installed ROS and install `habitat-sim` using source or `pip` associated with the ROS Python interpreter, which is not easy.
 
 ```sh
 # System dependencies (Ubuntu)

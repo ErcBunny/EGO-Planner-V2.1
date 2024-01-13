@@ -2,11 +2,15 @@
 .vscode
 .catkin*
 .DS_Store
+.rosinstall
 
 cmake-build-*
 src/CMakeLists.txt
 build
 devel
+logs
+build_isolated
+devel_isolated
 
 acados_export*
 
