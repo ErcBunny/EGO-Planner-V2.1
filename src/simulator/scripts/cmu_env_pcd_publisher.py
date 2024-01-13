@@ -11,7 +11,7 @@ if __name__ == "__main__":
     )
 
     # get pcd
-    pcd = o3d.io.read_point_cloud(rospy.get_param("~scene_id"))
+    pcd = o3d.io.read_point_cloud(rospy.get_param("~scene_id")).voxel_down_sample(0.1)
     points = np.asarray(pcd.points)
 
     # create pcd msg
@@ -38,8 +38,9 @@ if __name__ == "__main__":
 
     msg.data = np.asarray(points, np.float32).tobytes()
 
-    # publish cloud at 1 hz
+    # publish cloud at 1 hz for 5 times (publishing a large map is rather expensive)
     rate = rospy.Rate(1)
-    while not rospy.is_shutdown():
-        global_point_cloud_pub.publish(msg)
-        rate.sleep()
+    for i in range(5):
+        if not rospy.is_shutdown():
+            global_point_cloud_pub.publish(msg)
+            rate.sleep()
