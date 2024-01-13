@@ -27,7 +27,7 @@ mamba activate ego
 
 # Install ROS related stuff
 mamba install ros-noetic-desktop-full ros-noetic-joy -c robostack-staging -y
-mamba install compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools -y
+mamba install compilers cmake=3.12 pkg-config make ninja colcon-common-extensions catkin_tools -y
 
 # Other handy tools
 mamba install habitat-sim=0.2.4 -c aihabitat -y
@@ -61,7 +61,7 @@ Go back to the top repo directory and build the workspace.
 
 ```sh
 mamba activate ego
-catkin_make
+catkin_make # or catkin build
 ```
 
 ## Running Demos
