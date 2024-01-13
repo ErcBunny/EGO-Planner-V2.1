@@ -35,6 +35,8 @@
     <arg name="drone_id"/>
 
     <!-- range z: different meaning between grid_map.cpp and grid_map_bigmap.cpp -->
+    <!-- large range leads to increased time of map visualization, see show_occ_time -->
+    <!-- if the range is too large, navigation seems to be sluggish -->
     <arg name="local_map_update_range_x"/>
     <arg name="local_map_update_range_y"/>
     <arg name="local_map_update_range_z"/>

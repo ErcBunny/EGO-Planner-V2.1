@@ -32,7 +32,10 @@
         <arg name="map_size_z" value="$(arg map_size_z)"/>
         <arg name="odom_topic" value="$(arg odom_topic)"/>
         <arg name="flight_type" value="1"/>
-        <arg name="drone_type" default="0"/>
+        <arg name="drone_type" value="0"/>
+        <arg name="local_map_update_range_x" default="5.5"/>
+        <arg name="local_map_update_range_y" default="5.5"/>
+        <arg name="local_map_update_range_z" default="5.5"/>
     </include>
 </launch>
 
