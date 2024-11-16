@@ -91,6 +91,10 @@ roslaunch node_launcher single_diffdrive_interactive_habitat.launch
 
 ## Bibliography
 
+The original repo EGO-Planner-v2: https://github.com/ZJU-FAST-Lab/EGO-Planner-v2.
+
+The original paper can be cited as:
+
 ```
 @article{
     doi:10.1126/scirobotics.abm5954,
